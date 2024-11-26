@@ -3,7 +3,7 @@ from app.automated_task_assignment import get_all_users, fetch_unassigned_tasks,
 
 app = Flask(__name__)
 
-@app.route('/api/fetch_allusers', methods=['GET'])
+@app.route('/api/automated_task_assignment/fetch_allusers', methods=['GET'])
 def fetch_users():
     """
     Flask route to fetch and return all users as JSON.
@@ -14,7 +14,7 @@ def fetch_users():
     else:
         return jsonify({'error': 'Failed to fetch users from Azure DevOps'}), 500
 
-@app.route('/api/fetch_unassigned_tasks', methods=['GET'])
+@app.route('/api/automated_task_assignment/fetch_unassigned_tasks', methods=['GET'])
 def fetch_tasks():
     """
     Flask route to fetch and return all unassigned tasks as JSON.
@@ -25,7 +25,7 @@ def fetch_tasks():
     else:
         return jsonify({'error': 'Failed to fetch unassigned tasks from Azure DevOps'}), 500
 
-@app.route('/api/task_counts', methods=['GET'])
+@app.route('/api/automated_task_assignment/task_counts', methods=['GET'])
 def fetch_task_counts():
     """
     Flask route to fetch the count of tasks assigned to each user.
