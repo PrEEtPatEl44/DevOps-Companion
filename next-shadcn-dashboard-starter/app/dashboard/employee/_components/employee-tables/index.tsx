@@ -28,10 +28,11 @@ export default function EmployeeTable({
     setSearchQuery
   } = useEmployeeTableFilters();
 
+
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-4">
-        <DataTableSearch
+        {/* <DataTableSearch
           searchKey="name"
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
@@ -47,7 +48,7 @@ export default function EmployeeTable({
         <DataTableResetFilter
           isFilterActive={isAnyFilterActive}
           onReset={resetFilters}
-        />
+        /> */}
       </div>
       <DataTable columns={columns} data={data} totalItems={totalData} />
     </div>

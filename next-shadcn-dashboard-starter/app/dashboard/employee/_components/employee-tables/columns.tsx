@@ -26,23 +26,23 @@ export const columns: ColumnDef<Employee>[] = [
   },
   {
     accessorKey: 'first_name',
-    header: 'NAME'
+    header: 'ID'
   },
   {
     accessorKey: 'country',
-    header: 'COUNTRY'
+    header: 'TITLE'
   },
   {
     accessorKey: 'email',
-    header: 'EMAIL'
+    header: 'STATE'
   },
   {
     accessorKey: 'job',
-    header: 'COMPANY'
+    header: 'TYPE'
   },
   {
     accessorKey: 'gender',
-    header: 'GENDER'
+    header: 'URL'
   },
   {
     id: 'actions',
