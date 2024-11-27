@@ -8,4 +8,3 @@ AZURE_DEVOPS_GRAPH_API_URL = f"https://vssps.dev.azure.com/{ORG_NAME}/_apis/grap
 AZURE_DEVOPS_REST_API_URL = f"https://dev.azure.com/{ORG_NAME}/{PROJECT_NAME}/_apis"
 
 # Open AI API Key
-OpenAI_API_KEY = "REMOVED_OPENAI_KEY"
