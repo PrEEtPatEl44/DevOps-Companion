@@ -1,11 +1,11 @@
-import { auth } from '@/auth';
 import Providers from '@/components/layout/providers';
 import { Toaster } from '@/components/ui/sonner';
 import type { Metadata } from 'next';
 import { Lato } from 'next/font/google';
 import NextTopLoader from 'nextjs-toploader';
 import './globals.css';
-
+import { redirect } from 'next/navigation';
+import { getServerSession } from 'next-auth';
 export const metadata: Metadata = {
   title: 'Next Shadcn',
   description: 'Basic dashboard with Next.js and Shadcn'
@@ -22,8 +22,10 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const session = await auth();
+  const session = await getServerSession();
+  if(session){
   return (
+
     <html
       lang="en"
       className={`${lato.className}`}
@@ -31,11 +33,14 @@ export default async function RootLayout({
     >
       <body className={'overflow-hidden'}>
         <NextTopLoader showSpinner={false} />
-        <Providers session={session}>
+        <Providers session={null}>
           <Toaster />
           {children}
         </Providers>
       </body>
     </html>
-  );
+  );}
+  else{
+    redirect('/api/auth/signin');
+  }
 }
