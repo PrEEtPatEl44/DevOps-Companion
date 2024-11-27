@@ -166,3 +166,36 @@ def get_work_item_counts_for_all_users():
 
     return user_task_counts
 
+def update_work_item_assigned_to(work_item_id, user_email):
+    """
+    Update the 'Assigned To' field of a work item in Azure DevOps.
+    """
+    url = f'{AZURE_DEVOPS_REST_API_URL}/wit/workitems/{work_item_id}?api-version=7.1-preview.3'
+    auth = HTTPBasicAuth('', PAT)  # Empty username, PAT as the password
+    headers = {'Content-Type': 'application/json-patch+json'}
+    payload = [
+        {
+            "op": "add",
+            "path": "/fields/System.AssignedTo",
+            "value": user_email
+        }
+    ]
+    try:
+        logging.debug(f'Attempting to update work item {work_item_id} with user {user_email}')
+        response = requests.patch(url, auth=auth, headers=headers, json=payload)
+        logging.debug(f'Update Work Item URL: {url}')
+        logging.debug(f'Update Work Item Headers: {headers}')
+        logging.debug(f'Update Work Item Payload: {payload}')
+        logging.debug(f'Response Status Code: {response.status_code}')
+        logging.debug(f'Response Content: {response.content.decode()}')
+
+        if response.status_code == 200:
+            logging.info(f'Successfully updated work item {work_item_id} to {user_email}')
+            return response.json()
+        else:
+            logging.error(f'Failed to update work item {work_item_id}: {response.status_code}')
+            logging.error(f'Response Content: {response.content.decode()}')
+            return None
+    except requests.exceptions.RequestException as e:
+        logging.error(f'Request failed for work item {work_item_id}: {e}')
+        return None
