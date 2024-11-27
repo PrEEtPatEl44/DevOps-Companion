@@ -24,7 +24,6 @@ def get_all_users():
         logging.error(f'Request failed: {e}')
         return None
 
-
 def clean_user_data(raw_data):
     """
     Clean and structure user data from the raw API response.
@@ -42,7 +41,6 @@ def clean_user_data(raw_data):
 
     return cleaned_users
 
-    
 def fetch_unassigned_tasks():
     """
     Fetch unassigned tasks from Azure DevOps using WIQL.
@@ -136,7 +134,6 @@ def get_work_item_count_for_user(user_email):
     except requests.exceptions.RequestException as e:
         logging.error(f'Request failed for {user_email}: {e}')
         return 0
-
 
 def get_work_item_counts_for_all_users():
     """
