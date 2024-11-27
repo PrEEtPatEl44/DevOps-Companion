@@ -1,5 +1,6 @@
 from flask import Flask, jsonify
-from app.automated_task_assignment import get_all_users, fetch_unassigned_tasks, get_work_item_counts_for_all_users
+from app.automated_task_assignment import get_all_users, fetch_unassigned_tasks, get_work_item_counts_for_all_users, update_work_item_assigned_to
+from app.status_report import fetch_pending_tasks
 
 app = Flask(__name__)
 
@@ -36,6 +37,32 @@ def fetch_task_counts():
     else:
         return jsonify({'error': 'Failed to fetch task counts for users'}), 500
 
+@app.route('/api/automated_task_assignment/update_work_item/<int:work_item_id>/<user_email>', methods=['POST'])
+def update_work_item(work_item_id, user_email):
+    """
+    Flask route to update the 'Assigned To' field of a work item.
+    """
+    if not work_item_id or not user_email:
+        return jsonify({'error': 'Missing work_item_id or user_email'}), 400
+
+    result = update_work_item_assigned_to(work_item_id, user_email)
+    if result:
+        return jsonify(result)
+    else:
+        return jsonify({'error': 'Failed to update work item'}), 500
+    
+@app.route('/api/status_report/fetch_pending_tasks/<due_date>', methods=['POST'])
+def fetch_pending_tasks_route(due_date):
+    if not due_date:
+        return jsonify({'error': 'Missing due_date parameter'}), 400
+
+    tasks = fetch_pending_tasks(due_date)
+    if tasks:
+        return jsonify(tasks)
+    else:
+        return jsonify({'error': 'Failed to fetch pending tasks'}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)
+
+#/api/automated_task_assignment/update_work_item/1012/preet442727@outlook.com

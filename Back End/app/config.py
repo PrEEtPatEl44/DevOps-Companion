@@ -6,3 +6,6 @@ PAT = 'VJ2qQQgHniwwpMroZeGtayYSqnmVympa62s7oBOtc9DW0rJCjKo0JQQJ99AKACAAAAAAAAAAA
 # Base URLs
 AZURE_DEVOPS_GRAPH_API_URL = f"https://vssps.dev.azure.com/{ORG_NAME}/_apis/graph"
 AZURE_DEVOPS_REST_API_URL = f"https://dev.azure.com/{ORG_NAME}/{PROJECT_NAME}/_apis"
+
+# Open AI API Key
+OpenAI_API_KEY = "REMOVED_OPENAI_KEY"
