@@ -52,16 +52,4 @@ def generate_subject_line(body):
     prompt = f"Create a concise and professional subject line for this email body: {body}"
     return send_chat(prompt, None)
 
-# Example Usage
-if __name__ == "__main__":
-    # Test send_chat
-    response = send_chat("Is Christian correct or Hailey? Answer without context.", None)
-    print("Chat Response:", response)
 
-    # Test generate_gpt_email
-    email = generate_gpt_email("john.doe@example.com", "jane.doe@example.com", "Discuss Q4 financial results and set up a meeting.")
-    print("\nGenerated Email:\n", email)
-
-    # Test generate_subject_line
-    subject = generate_subject_line(email)
-    print("\nGenerated Subject Line:", subject)

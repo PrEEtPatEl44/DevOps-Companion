@@ -1,7 +1,7 @@
 import logging
 import requests
 from requests.auth import HTTPBasicAuth
-from app.config import AZURE_DEVOPS_GRAPH_API_URL, PAT, AZURE_DEVOPS_REST_API_URL
+from app.config import AZURE_DEVOPS_GRAPH_API_URL, PAT, AZURE_DEVOPS_REST_API_URL, PROJECT_NAME
 
 def get_all_users():
     """
@@ -50,10 +50,10 @@ def fetch_unassigned_tasks():
 
     # Define the WIQL query
     query = {
-        "query": """
-        SELECT [System.Id], [System.Title], [System.State], [System.AssignedTo]
+        "query": f"""
+        SELECT [System.Id], [System.Title], [System.State], [System.AssignedTo], [System.TeamProject]
         FROM WorkItems
-        WHERE [System.AssignedTo] = ''
+        WHERE [System.AssignedTo] = '' AND [System.TeamProject] = '{PROJECT_NAME}'
         ORDER BY [System.ChangedDate] DESC
         """
     }
@@ -112,7 +112,7 @@ def get_work_item_count_for_user(user_email):
         "query": f"""
         SELECT [System.Id]
         FROM WorkItems
-        WHERE [System.AssignedTo] = '{user_email}'
+        WHERE [System.AssignedTo] = '{user_email}' 
         """
     }
 
