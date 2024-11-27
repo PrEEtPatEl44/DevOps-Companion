@@ -39,12 +39,11 @@ import {
   GalleryVerticalEnd,
   LogOut
 } from 'lucide-react';
-import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import * as React from 'react';
 import { Icons } from '../icons';
-
+import { signOut, useSession } from "next-auth/react";
 export const company = {
   name: 'Acme Inc',
   logo: GalleryVerticalEnd,
@@ -54,7 +53,16 @@ export const company = {
 export default function AppSidebar() {
   const { data: session } = useSession();
   const pathname = usePathname();
-
+  const handleLogOutClick = async () => {
+    try {
+      await signOut();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  if (status === 'loading') {
+    return <div>Loading...</div>;
+  }
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader>
@@ -189,7 +197,7 @@ export default function AppSidebar() {
                 <DropdownMenuSeparator />
 
                 <DropdownMenuGroup>
-                  <DropdownMenuItem>
+                  {/* <DropdownMenuItem>
                     <BadgeCheck />
                     Account
                   </DropdownMenuItem>
@@ -200,12 +208,12 @@ export default function AppSidebar() {
                   <DropdownMenuItem>
                     <Bell />
                     Notifications
-                  </DropdownMenuItem>
+                  </DropdownMenuItem> */}
                 </DropdownMenuGroup>
-                <DropdownMenuSeparator />
+                {/* <DropdownMenuSeparator /> */}
                 <DropdownMenuItem>
                   <LogOut />
-                  Log out
+                  <button onClick={handleLogOutClick}>Logout</button>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
