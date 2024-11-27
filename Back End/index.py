@@ -3,7 +3,7 @@ from app.automated_task_assignment import get_all_users, fetch_unassigned_tasks,
 from app.status_report import fetch_pending_tasks
 
 app = Flask(__name__)
-CORS(app) 
+
 @app.route('/api/automated_task_assignment/fetch_allusers', methods=['GET'])
 def fetch_users():
     """
@@ -61,6 +61,8 @@ def fetch_pending_tasks_route(due_date):
         return jsonify(tasks)
     else:
         return jsonify({'error': 'Failed to fetch pending tasks'}), 500
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)
