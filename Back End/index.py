@@ -1,8 +1,9 @@
 from flask import Flask, jsonify
+from flask_cors import CORS
 from app.automated_task_assignment import get_all_users, fetch_unassigned_tasks, get_work_item_counts_for_all_users
 
 app = Flask(__name__)
-
+CORS(app) 
 @app.route('/api/automated_task_assignment/fetch_allusers', methods=['GET'])
 def fetch_users():
     """

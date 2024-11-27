@@ -90,6 +90,13 @@ export const users: User[] = [
     status: 'Active'
   }
 ];
+// export interface Task {
+//   id: number;
+//   title: string;
+//   state: string;
+//   url: string;
+//   workItemType: string;
+// }
 
 export type Employee = {
   id: number;
