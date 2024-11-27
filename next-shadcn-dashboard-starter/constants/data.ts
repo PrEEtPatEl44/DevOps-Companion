@@ -97,7 +97,13 @@ export const users: User[] = [
 //   url: string;
 //   workItemType: string;
 // }
-
+export type Task = {
+  id: number;
+  url: string;
+  workItemType: string;
+  state: string;
+  title: string;
+};
 export type Employee = {
   id: number;
   first_name: string;
