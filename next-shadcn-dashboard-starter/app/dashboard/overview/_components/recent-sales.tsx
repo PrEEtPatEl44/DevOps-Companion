@@ -1,75 +1,46 @@
+'use client';
+
+import React, { useEffect, useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 export function RecentSales() {
+  const [taskData, setTaskData] = useState<any>(null);
+
+  useEffect(() => {
+    // Fetch data from the API
+    const fetchData = async () => {
+      const response = await fetch('http://127.0.0.1:5000/api/automated_task_assignment/task_counts');
+      const data = await response.json();
+      setTaskData(data);
+    };
+
+    fetchData();
+  }, []);
+
+  // If the data is not yet loaded, you can return a loading state
+  if (!taskData) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <div className="space-y-8">
-      <div className="flex items-center">
-        <Avatar className="h-9 w-9">
-          <AvatarImage src="/avatars/01.png" alt="Avatar" />
-          <AvatarFallback>OM</AvatarFallback>
-        </Avatar>
-        <div className="ml-4 space-y-1">
-          <p className="text-sm font-medium leading-none">Olivia Martin</p>
-          <p className="text-sm text-muted-foreground">
-            olivia.martin@email.com
-          </p>
-        </div>
-        <div className="ml-auto font-medium">Working on 2 tasks</div>
-      </div>
-      <div className="flex items-center">
-        <Avatar className="flex h-9 w-9 items-center justify-center space-y-0 border">
-          <AvatarImage src="/avatars/02.png" alt="Avatar" />
-          <AvatarFallback>JL</AvatarFallback>
-        </Avatar>
-        <div className="ml-4 space-y-1">
-          <p className="text-sm font-medium leading-none">Jackson Lee</p>
-          <p className="text-sm text-muted-foreground">jackson.lee@email.com</p>
-        </div>
-        {/* <div className="ml-auto font-medium">+$39.00</div> */}
-        <div className="ml-auto font-medium">Working on 2 tasks</div>
+      {Object.keys(taskData).map((email) => {
+        const { displayName, taskCount } = taskData[email];
 
-      </div>
-      <div className="flex items-center">
-        <Avatar className="h-9 w-9">
-          <AvatarImage src="/avatars/03.png" alt="Avatar" />
-          <AvatarFallback>IN</AvatarFallback>
-        </Avatar>
-        <div className="ml-4 space-y-1">
-          <p className="text-sm font-medium leading-none">Isabella Nguyen</p>
-          <p className="text-sm text-muted-foreground">
-            isabella.nguyen@email.com
-          </p>
-        </div>
-        {/* <div className="ml-auto font-medium">+$299.00</div> */}
-        <div className="ml-auto font-medium">Working on 2 tasks and 3 bugfixes</div>
-
-      </div>
-      <div className="flex items-center">
-        <Avatar className="h-9 w-9">
-          <AvatarImage src="/avatars/04.png" alt="Avatar" />
-          <AvatarFallback>WK</AvatarFallback>
-        </Avatar>
-        <div className="ml-4 space-y-1">
-          <p className="text-sm font-medium leading-none">William Kim</p>
-          <p className="text-sm text-muted-foreground">will@email.com</p>
-        </div>
-        {/* <div className="ml-auto font-medium">+$99.00</div> */}
-        <div className="ml-auto font-medium">Working on 4 tasks and 1 bug fixes</div>
-
-      </div>
-      <div className="flex items-center">
-        <Avatar className="h-9 w-9">
-          <AvatarImage src="/avatars/05.png" alt="Avatar" />
-          <AvatarFallback>SD</AvatarFallback>
-        </Avatar>
-        <div className="ml-4 space-y-1">
-          <p className="text-sm font-medium leading-none">Sofia Davis</p>
-          <p className="text-sm text-muted-foreground">sofia.davis@email.com</p>
-        </div>
-        {/* <div className="ml-auto font-medium">+$39.00</div> */}
-        <div className="ml-auto font-medium">Working on 7 tasks</div>
-
-      </div>
+        return (
+          <div className="flex items-center" key={email}>
+            <Avatar className="h-9 w-9">
+              <AvatarImage src="/avatars/01.png" alt="Avatar" />
+              <AvatarFallback>{displayName?.slice(0, 2).toUpperCase()}</AvatarFallback>
+            </Avatar>
+            <div className="ml-4 space-y-1">
+              <p className="text-sm font-medium leading-none">{displayName}</p>
+              <p className="text-sm text-muted-foreground">{email}</p>
+            </div>
+            <div className="ml-auto font-medium">Working on {taskCount} tasks</div>
+          </div>
+        );
+      })}
     </div>
   );
 }
