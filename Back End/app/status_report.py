@@ -1,6 +1,6 @@
 import requests
 from requests.auth import HTTPBasicAuth
-from config import AZURE_DEVOPS_REST_API_URL, PAT
+from app.config import AZURE_DEVOPS_REST_API_URL, PAT
 import logging
 
 def fetch_pending_tasks(due_date):
