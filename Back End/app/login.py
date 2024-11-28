@@ -1,0 +1,28 @@
+import requests
+
+def fetch_user_projects(auth_token):
+    url = "https://devops.example.com/api/projects"
+    headers = {
+        "Authorization": f"Bearer {auth_token}"
+    }
+
+    response = requests.get(url, headers=headers)
+
+    if response.status_code == 200:
+        return response.json()
+    else:
+        response.raise_for_status()
+
+# Example usage:
+auth_token = "EwCIA8l6BAAUbDba3x2OMJElkF7gJ4z/VbCPEz0AAdya5J2V7Ase6mMB/dOTccjHENxlP3EGGxFLrbWOnb3cbTX9hQKRLY0DJcJ2s5VzUZgAh57QhO+L27u/lR0FsuyIFlVTI3SGFmIhfb7a4oBcSPQBv0aaIhvq2rNio2qTUR3nFZOViK9q0cn51qOyTEgunDGROzxMwYd+3Q99Lc7bHMHFkdzJwAFHh8QfVNccUUGh/94glqrz1armC5MfxtGXisam9g/hfInepE/vu8HPs/Vh2oqea4aLS+zgVfujqUIe2lQG99XVWEChJCsA8GS3h35eTA+lhGcBzhO4XB5h6bnHIXCy0Ef4f5ujha53SztuT5Oj/ciCDzHar53TJCMQZgAAEJJcGXuIwMWxMpQMXhBvZ8xQAl65Wx2bZ6sEUsG/wkoo82T5hYwicaSxzdgtWmVlStwguDvRJ0HHYInM9kAXWotCTge2ei0DwnSkGmRU9FF3fzqktyrCA9IqU8BxXuBtGMeIRwoYGIaKxnxHG3lAP61hGSfMQA9TMi7CkxZBe+eARKzc6oGqAvr9E34/cp49kCYmXQhvz0ik/y8tn3+eCsw8QhOgwk87jVqltUGl1QWRroYhr/rX2j2PtJjx8GjKuVKL0q5ak6wmXhIcQ+sdeXWsSKlZVHXUdXkgqenzkKsTArLCLt6CptOhXpDJjRKiRYximXY6bvkv3x1qL5pvAIrtRtGyiec1yFS5qDI9AZJ3aKn0U3nDb3E1EjToN1r3ppdZDsmIFNQsq9f7bk1dQd3+9hwJKC1/kiwRhLCOlLOXsReg3eM38v//fSFxJbkkvvt4H1ajzrwWSsYhQHC1SorUG5jCNQVH/ui4neymgOUop6tB2T1GSGYBRGigeswaTIFY625E45F3xlXXWyz+8UdFdeZHmo/zPiWyXAvIdantpLVpterGCyFat2OOksS58RyVOA5SvGR7NczUfueSaryqbw5ajbFmOauLI1bFBbkmICSB4z2p7iwveDDe5PJjMLDwNwztSY/5fI76J2NiQdJHt6KxwnbpFoMLhGS0Vb4DKjsaDZtlum7FnEuu/zimY8lNDzIXuxhQ+i1Y9gPSEY8BA7KRwwfFFPdoIlV3TP8cvfwhkU46/FDz5YbNkoxkc7VRqM3tJEwB8LxY1le8esrRKHhHzqQrBJaJ/Pu+LCRE+72IAg=="
+projects = fetch_user_projects(auth_token)
+print(projects)
+
+def save_auth_token(auth_token, file_path):
+    try:
+        with open(file_path, 'w') as file:
+            file.write(auth_token)
+        print("Auth token saved successfully.")
+    except Exception as e:
+        print(f"An error occurred while saving the auth token: {e}")
+
