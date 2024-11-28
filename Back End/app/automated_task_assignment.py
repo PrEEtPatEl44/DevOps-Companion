@@ -1,7 +1,8 @@
 import logging
 import requests
 from requests.auth import HTTPBasicAuth
-from app.config import AZURE_DEVOPS_GRAPH_API_URL, PAT, AZURE_DEVOPS_REST_API_URL, PROJECT_NAME
+from helper.chatgpt import send_chat
+from app.config import AZURE_DEVOPS_REST_API_URL, AZURE_DEVOPS_GRAPH_API_URL, PAT, PROJECT_NAME
 
 def get_all_users():
     """
@@ -196,3 +197,69 @@ def update_work_item_assigned_to(work_item_id, user_email):
     except requests.exceptions.RequestException as e:
         logging.error(f'Request failed for work item {work_item_id}: {e}')
         return None
+    
+def generate_gpt_task_assignment(unassigned_work_items, all_tasks):
+    """
+    Generates task assignments using GPT-4.
+    :param unassigned_work_items: List of unassigned work items.
+    :param all_tasks: List of all tasks.
+    :return: Generated task assignments as a string.
+    """
+    assignment_count_per_person = get_work_item_counts_for_all_users()
+    prompt = (
+        f"Analyze the unassigned work item(s): {unassigned_work_items}. "
+        f"Consider the task counts currently assigned to each person: {assignment_count_per_person}. "
+        f"Take into account all tasks and their assignments: {all_tasks}. "
+        f"Based on availability and expertise, determine 3 people who should be assigned the unassigned tasks. "
+        f"Determine expertise from the tasks that the user is assigned to. "
+        f"Ensure assignments are balanced and align with each individual's expertise and workload. "
+        f"DO NOT INCLUDE ANYTHING BUT THE EMAIL OF USER and a short message explaining why they are the best fit for the task."
+    )
+
+
+    schema = {
+        "name": "task_assignment_response",
+        "schema": {
+            "type": "object",
+            "properties": {
+            "assignments": {
+                "type": "array",
+                "description": "List of individuals assigned to tasks",
+                "items": {
+                "type": "object",
+                "properties": {
+                    "email": {
+                    "type": "string",
+                    "description": "Email of the user selected for the assignment"
+                    },
+                    "reason": {
+                    "type": "string",
+                    "description": "A short explanation of why the user is the best fit for the task"
+                    }
+                },
+                "required": [
+                    "email",
+                    "reason"
+                ],
+                "additionalProperties": False
+                }
+            }
+            },
+            "$defs": {},
+            "required": [
+            "assignments"
+            ],
+            "additionalProperties": False
+        },
+        "strict": True
+        }
+    
+  
+
+
+    return send_chat(prompt, context="Task assignment logic", model="gpt-4o-mini", schema=schema)
+
+
+
+
+
