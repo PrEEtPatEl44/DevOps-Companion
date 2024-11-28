@@ -1,8 +1,8 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from app.automated_task_assignment import get_all_users, fetch_unassigned_tasks, get_work_item_counts_for_all_users, update_work_item_assigned_to
 from app.status_report import fetch_pending_tasks
 from flask_cors import CORS
-from app.stats import count_work_items_by_state, count_work_items_by_assignment
+from app.stats import count_work_items_by_state, count_work_items_by_assignment, count_work_items_by_type
 
 app = Flask(__name__)
 CORS(app)
@@ -82,6 +82,26 @@ def count_work_items_by_assignment_route():
         return jsonify(counts)
     else:
         return jsonify({'error': 'Failed to count work items by assignment'}), 500
+    
+@app.route('/api/stats/count_work_items_by_type', methods=['GET'])
+def count_work_items_by_type_route():
+    counts = count_work_items_by_type()
+    if counts:
+        return jsonify(counts)
+    else:
+        return jsonify({'error': 'Failed to count work items by assignment'}), 500
+
+@app.route('/api/receive-token', methods=['POST'])
+def receive_token():
+    data = request.get_json()
+    access_token = data.get('access_token')
+    
+    if access_token:
+        print(f"Received token: {access_token}")
+        return jsonify({"message": "Token received successfully", "status": "success"}), 200
+    else:
+        return jsonify({"message": "No token provided", "status": "error"}), 400
+
 
 
 
