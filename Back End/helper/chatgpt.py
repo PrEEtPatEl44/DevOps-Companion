@@ -2,9 +2,14 @@ import os
 from openai import OpenAI
 import json
 from flask import Flask, jsonify, request
+
 # Initialize OpenAI client
+# Load API key from a text file
+with open('apikeys.txt', 'r') as file:
+    api_key = file.read().strip()
+
 client = OpenAI(
-    api_key="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"
+    api_key=api_key
 )
 
 # Function to send a chat with given prompt and context
