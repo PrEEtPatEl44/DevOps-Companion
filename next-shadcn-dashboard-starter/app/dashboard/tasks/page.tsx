@@ -1,20 +1,17 @@
-'use client';
-import { ColumnDef } from '@tanstack/react-table'; // Assuming you are using tanstack's table for DataTable
-import { DataTable } from '@/components/ui/table/data-table';
+"use client"
 import { useState, useEffect } from 'react';
+import { ColumnDef, useReactTable, getCoreRowModel, getPaginationRowModel } from '@tanstack/react-table';
+import { DataTable } from '@/components/ui/table/data-table';
 import { Heading } from '@/components/ui/heading';
 import { Checkbox } from '@/components/ui/checkbox';
 import PageContainer from '@/components/layout/page-container';
 import { CellAction } from './_components/task-tables/cell-action';
 import { Task } from '@/constants/data';
 import Link from 'next/link';
-import { MessageSquareCode, Plus } from 'lucide-react';
+import { MessageSquareCode } from 'lucide-react';
 import { buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
-// Define Task type here
-
-// Define columns for the Task table
 const columns: ColumnDef<Task, unknown>[] = [
   {
     id: 'select',
@@ -37,40 +34,34 @@ const columns: ColumnDef<Task, unknown>[] = [
   },
   {
     header: 'ID',
-    accessorKey: 'id', // Key for accessing data
-    cell: (info) => info.getValue() // Rendering as a clickable link
+    accessorKey: 'id',
+    cell: (info) => info.getValue()
   },
   {
     header: 'Type',
-    accessorKey: 'workItemType', // Key for accessing data
-    cell: (info) => info.getValue() // Display the workItemType value
+    accessorKey: 'workItemType',
+    cell: (info) => info.getValue()
   },
   {
     header: 'State',
-    accessorKey: 'state', // Key for accessing data
-    cell: (info) => info.getValue() // Display the state value
+    accessorKey: 'state',
+    cell: (info) => info.getValue()
   },
   {
     header: 'Title',
-    accessorKey: 'title', // Key for accessing data
-    cell: (info) => info.getValue() // Display the title value
+    accessorKey: 'title',
+    cell: (info) => info.getValue()
   },
   {
     id: 'actions',
-    cell: ({ row }) => <CellAction data={row.original} /> //
+    cell: ({ row }) => <CellAction data={row.original} />
   }
-  // {
-  //   header: 'URL',
-  //   accessorKey: 'url', // Key for accessing data
-  //   cell: (info) => info.getValue(), // Display the title value
-  // },
 ];
 
 export default function TaskTable() {
   const [tasks, setTasks] = useState<Task[]>([]);
-  const [stateFilter, setStateFilter] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState<string>('');
-  const [isAnyFilterActive, setIsAnyFilterActive] = useState<boolean>(false);
+  const [rowSelection, setRowSelection] = useState({});
+
   useEffect(() => {
     const fetchTasks = async () => {
       try {
@@ -79,7 +70,6 @@ export default function TaskTable() {
         );
         const data = await response.json();
 
-        // Map the response data to match the Task type
         const fetchedTasks = data.workItems.map((item: any) => ({
           id: item.id,
           url: item.url,
@@ -97,21 +87,18 @@ export default function TaskTable() {
     fetchTasks();
   }, []);
 
-  // Reset all filters
-  const resetFilters = () => {
-    setStateFilter(null);
-    setSearchQuery('');
-    setIsAnyFilterActive(false);
-  };
-
-  // Filter the data based on stateFilter and searchQuery
-  const filteredData = tasks.filter((task) => {
-    const matchesState = stateFilter ? task.state === stateFilter : true;
-    const matchesSearchQuery =
-      task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      task.workItemType.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesState && matchesSearchQuery;
+  const table = useReactTable({
+    data: tasks,
+    columns,
+    state: { rowSelection },
+    getCoreRowModel: getCoreRowModel(),
+    onRowSelectionChange: setRowSelection,
+    getPaginationRowModel: getPaginationRowModel(),
   });
+
+  const selectedRows = table
+    .getSelectedRowModel()
+    .rows.map((row) => row.original);
 
   return (
     <PageContainer scrollable>
@@ -119,34 +106,25 @@ export default function TaskTable() {
         <div className="flex items-start justify-between">
           <Heading
             title="Unassigned WorkItems"
-            description="Manage Uassigned Work items"
+            description="Manage Unassigned Work items"
           />
           <div className='flex'>
             <div className='mx-2'>
-              <Link
-                href={'/dashboard/tasks'}
+              <button
+                onClick={() => console.log(selectedRows)}
                 className={cn(buttonVariants({ variant: 'default' }))}
               >
                 <MessageSquareCode className="mx-2" />
                 Ask AI to Assign
-              </Link>
-            </div>
-            <div className='mx-2'>
-              <Link
-                href={'/dashboard/tasks'}
-                className={cn(buttonVariants({ variant: 'default' }))}
-              >
-                <Plus className="mx-2" />
-                Assign Selected Manually
-              </Link>
+              </button>
             </div>
           </div>
         </div>
         <DataTable
-          columns={columns}
-          data={filteredData}
-          totalItems={filteredData.length}
-        />
+  columns={columns}
+  data={tasks}
+  totalItems={tasks.length}
+/>
       </div>
     </PageContainer>
   );
