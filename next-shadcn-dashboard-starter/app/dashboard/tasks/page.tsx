@@ -1,102 +1,131 @@
 "use client"
-import { ColumnDef } from '@tanstack/react-table'; // Assuming you are using tanstack's table for DataTable
-import { DataTable } from '@/components/ui/table/data-table';
 import { useState, useEffect } from 'react';
-import { Heading } from 'lucide-react';
-// Define Task type here
-export type Task = {
-  id: number;
-  url: string;
-  workItemType: string;
-  state: string;
-  title: string;
-};
+import { ColumnDef, useReactTable, getCoreRowModel, getPaginationRowModel } from '@tanstack/react-table';
+import { DataTable } from '@/components/ui/table/data-table';
+import { Heading } from '@/components/ui/heading';
+import { Checkbox } from '@/components/ui/checkbox';
+import PageContainer from '@/components/layout/page-container';
+import { CellAction } from './_components/task-tables/cell-action';
+import { Task } from '@/constants/data';
+import Link from 'next/link';
+import { MessageSquareCode } from 'lucide-react';
+import { buttonVariants } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
-// Define columns for the Task table
 const columns: ColumnDef<Task, unknown>[] = [
   {
+    id: 'select',
+    header: ({ table }) => (
+      <Checkbox
+        checked={table.getIsAllPageRowsSelected()}
+        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+        aria-label="Select all"
+      />
+    ),
+    cell: ({ row }) => (
+      <Checkbox
+        checked={row.getIsSelected()}
+        onCheckedChange={(value) => row.toggleSelected(!!value)}
+        aria-label="Select row"
+      />
+    ),
+    enableSorting: false,
+    enableHiding: false
+  },
+  {
     header: 'ID',
-    accessorKey: 'id', // Key for accessing data
-    cell: (info) => info.getValue(), // Rendering as a clickable link
+    accessorKey: 'id',
+    cell: (info) => info.getValue()
   },
   {
     header: 'Type',
-    accessorKey: 'workItemType', // Key for accessing data
-    cell: (info) => info.getValue(), // Display the workItemType value
+    accessorKey: 'workItemType',
+    cell: (info) => info.getValue()
   },
   {
     header: 'State',
-    accessorKey: 'state', // Key for accessing data
-    cell: (info) => info.getValue(), // Display the state value
+    accessorKey: 'state',
+    cell: (info) => info.getValue()
   },
   {
     header: 'Title',
-    accessorKey: 'title', // Key for accessing data
-    cell: (info) => info.getValue(), // Display the title value
+    accessorKey: 'title',
+    cell: (info) => info.getValue()
   },
   {
-    header: 'URL',
-    accessorKey: 'url', // Key for accessing data
-    cell: (info) => info.getValue(), // Display the title value
-  },
+    id: 'actions',
+    cell: ({ row }) => <CellAction data={row.original} />
+  }
 ];
 
-
-
 export default function TaskTable() {
-  const [tasks, setTasks] = useState<Task[]>([])
-  const [stateFilter, setStateFilter] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState<string>('');
-  const [isAnyFilterActive, setIsAnyFilterActive] = useState<boolean>(false);
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [rowSelection, setRowSelection] = useState({});
 
   useEffect(() => {
     const fetchTasks = async () => {
       try {
-        const response = await fetch('http://127.0.0.1:5000/api/automated_task_assignment/fetch_unassigned_tasks');
+        const response = await fetch(
+          'http://127.0.0.1:5000/api/automated_task_assignment/fetch_unassigned_tasks'
+        );
         const data = await response.json();
-        
-        // Map the response data to match the Task type
+
         const fetchedTasks = data.workItems.map((item: any) => ({
           id: item.id,
           url: item.url,
           workItemType: item.fields['System.WorkItemType'],
           state: item.fields['System.State'],
-          title: item.fields['System.Title'],
+          title: item.fields['System.Title']
         }));
-  
+
         setTasks(fetchedTasks);
       } catch (error) {
         console.error('Error fetching tasks:', error);
       }
     };
-  
+
     fetchTasks();
-  }, []); 
+  }, []);
 
-  // Reset all filters
-  const resetFilters = () => {
-    setStateFilter(null);
-    setSearchQuery('');
-    setIsAnyFilterActive(false);
-  };
-
-  // Filter the data based on stateFilter and searchQuery
-  const filteredData = tasks.filter((task) => {
-    const matchesState = stateFilter ? task.state === stateFilter : true;
-    const matchesSearchQuery =
-      task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      task.workItemType.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesState && matchesSearchQuery;
+  const table = useReactTable({
+    data: tasks,
+    columns,
+    state: { rowSelection },
+    getCoreRowModel: getCoreRowModel(),
+    onRowSelectionChange: setRowSelection,
+    getPaginationRowModel: getPaginationRowModel(),
   });
 
+  const selectedRows = table
+    .getSelectedRowModel()
+    .rows.map((row) => row.original);
+
   return (
-    
-    <div className=" text-black">
-    
-      <div className="flex flex-wrap items-center gap-4 ">
-        
+    <PageContainer scrollable>
+      <div className="space-y-4 text-black">
+        <div className="flex items-start justify-between">
+          <Heading
+            title="Unassigned WorkItems"
+            description="Manage Unassigned Work items"
+          />
+          <div className='flex'>
+            <div className='mx-2'>
+              <button
+                onClick={() => console.log(selectedRows)}
+                className={cn(buttonVariants({ variant: 'default' }))}
+              >
+                <MessageSquareCode className="mx-2" />
+                Ask AI to Assign
+              </button>
+            </div>
+          </div>
+        </div>
+        <DataTable
+  columns={columns}
+  data={tasks}
+  totalItems={tasks.length}
+/>
       </div>
-      <DataTable  columns={columns} data={filteredData} totalItems={filteredData.length} />
-    </div>
+    </PageContainer>
   );
 }
