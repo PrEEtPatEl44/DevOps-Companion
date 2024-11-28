@@ -45,9 +45,9 @@ import * as React from 'react';
 import { Icons } from '../icons';
 import { signOut, useSession } from "next-auth/react";
 export const company = {
-  name: 'Acme Inc',
-  logo: GalleryVerticalEnd,
-  plan: 'Enterprise'
+  name: 'FGF',
+  // logo: GalleryVerticalEnd,
+  plan: 'F...ing Great Food '
 };
 
 export default function AppSidebar() {
@@ -68,7 +68,8 @@ export default function AppSidebar() {
       <SidebarHeader>
         <div className="flex gap-2 py-2 text-sidebar-accent-foreground ">
           <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-            <company.logo className="size-4" />
+            {/* <company.logo className="size-4" /> */}
+            <img src="https://www.fgfbrands.com/wp-content/uploads/2021/09/FGF-Brands-Logo.png" alt="" />
           </div>
           <div className="grid flex-1 text-left text-sm leading-tight">
             <span className="truncate font-semibold">{company.name}</span>
