@@ -4,7 +4,6 @@ from requests.auth import HTTPBasicAuth
 from app.config import AZURE_DEVOPS_REST_API_URL, PAT, PROJECT_NAME
 import pandas as pd
 from datetime import datetime
-from ms_project import MSPProject, MSPTask
 
 def fetch_all_work_items():
     """
