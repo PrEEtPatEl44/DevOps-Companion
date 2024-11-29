@@ -3,7 +3,9 @@ from app.automated_task_assignment import get_all_users, fetch_unassigned_tasks,
 from app.status_report import fetch_pending_tasks
 from flask_cors import CORS
 from app.stats import count_work_items_by_state, count_work_items_by_assignment, count_work_items_by_type
-from app.project_plan import fetch_all_work_items
+from app.project_plan import fetch_all_work_items,generate_ms_project_plan
+from app.config import jwt_token
+from app.risk import filter_risk_items
 app = Flask(__name__)
 CORS(app)
 
@@ -61,7 +63,7 @@ def generate_gpt_task_assignment_route(task_id):
     """
     if not task_id:
         return jsonify({'error': 'Missing task_id parameter'}), 400
-
+    
     try:
         assignments = generate_gpt_task_assignment(task_id, fetch_all_work_items())
         return jsonify(assignments)
@@ -108,10 +110,10 @@ def count_work_items_by_type_route():
 @app.route('/api/receive-token', methods=['POST'])
 def receive_token():
     data = request.get_json()
-    access_token = data.get('access_token')
+    jwt_token = data.get('access_token')
     
-    if access_token:
-        print(f"Received token: {access_token}")
+    if jwt_token:
+        print(f"Received token: {jwt_token}")
         return jsonify({"message": "Token received successfully", "status": "success"}), 200
     else:
         return jsonify({"message": "No token provided", "status": "error"}), 400
@@ -163,7 +165,17 @@ def generate_gpt_task_assignment_route_all():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@app.route('/api/risk/filter_risk_items', methods=['GET'])
+def fetch_filter_risks():
+    """
+    Flask route to filter risk items.
+    """
+    risk_items = filter_risk_items()
+    if risk_items:
+        return jsonify(risk_items)
+    else:
+        return jsonify({'error': 'Failed to filter risk items'}), 500       
+
 if __name__ == '__main__':
     app.run(debug=True)
 
-#/api/automated_task_assignment/update_work_item/1012/preet442727@outlook.com
