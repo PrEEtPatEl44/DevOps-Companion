@@ -4,6 +4,7 @@ from  app.automated_task_assignment import calculate_priority_score,validate_and
 import logging
 from datetime import datetime, timedelta
 from helper.chatgpt import send_chat
+from flask import jsonify
 def filter_risk_items():
     all_tasks = fetch_all_work_items()
     risk = []

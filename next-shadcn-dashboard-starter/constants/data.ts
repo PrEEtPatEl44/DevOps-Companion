@@ -106,11 +106,15 @@ export type Task = {
 };
 
 export type Risk = {
-  id: number;
-  url: string;
-  workItemType: string;
-  state: string;
-  title: string;
+  id: number,
+  title: string,
+  state: string,
+  assignedTo: string,
+  project: string,
+  priority: string,
+  severity: string,
+  dueDate: string,
+  priorityScore: number,
 };
 export type Employee = {
   id: number;
@@ -163,6 +167,14 @@ export const navItems: NavItem[] = [
     title: 'Unassigned Tasks',
     url: '/dashboard/tasks',
     icon: 'userPen',
+    shortcut: ['e', 'e'],
+    isActive: false,
+    items: [] // No child items
+  },
+  {
+    title: 'Risk Tasks',
+    url: '/dashboard/risks',
+    icon: 'UmbrellaOff',
     shortcut: ['e', 'e'],
     isActive: false,
     items: [] // No child items
