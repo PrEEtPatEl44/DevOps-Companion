@@ -53,6 +53,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
       const url = `http://127.0.0.1:5000/api/automated_task_assignment/update_work_item/${data.id}/${email}`;
       const response = await fetch(url, {
         method: 'POST',
+        mode: 'cors',
       });
 
       if (response.ok) {
