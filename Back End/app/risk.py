@@ -1,12 +1,13 @@
 from app.project_plan import fetch_all_work_items
 import logging
-from  app.automated_task_assignment import calculate_priority_score,validate_and_parse_json
+from  app.automated_task_assignment import calculate_priority_score,validate_and_parse_json, get_all_users, clean_user_data
 import logging
 from datetime import datetime, timedelta
 from helper.chatgpt import send_chat
 def filter_risk_items():
     all_tasks = fetch_all_work_items()
     risk = []
+    all_users = get_all_users()
     if isinstance(all_tasks, dict) and "workItems" in all_tasks:
         tasks = all_tasks["workItems"]
     else:
@@ -88,6 +89,10 @@ def filter_risk_items():
                 "priority_score": {
                 "type": "number",
                 "description": "Calculated score based on priority."
+                },
+                "user_email": {
+                "type": "string",
+                "description": "Email of the user assigned to the item."
                 }
             },
             "required": [
@@ -99,7 +104,8 @@ def filter_risk_items():
                 "priority",
                 "severity",
                 "due_date",
-                "priority_score"
+                "priority_score",
+                "user_email"
             ],
             "additionalProperties": False
             }
@@ -121,6 +127,7 @@ def filter_risk_items():
     f"- Tasks with the highest priority scores. "
     f"- Tasks approaching their due dates, especially if their status is 'new' or 'in-progress'. "
     f"- Tasks that have a high priority_score, regardless of their status. "
+    f"Match assigned to with the list of all users to get email {all_users}."
     f"Do not include explanations or details outside the required schema."
     )
     
