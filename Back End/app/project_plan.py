@@ -2,6 +2,9 @@ import requests
 import logging
 from requests.auth import HTTPBasicAuth
 from app.config import AZURE_DEVOPS_REST_API_URL, PAT, PROJECT_NAME
+import pandas as pd
+from datetime import datetime
+from ms_project import MSPProject, MSPTask
 
 def fetch_all_work_items():
     """
@@ -22,12 +25,13 @@ def fetch_all_work_items():
     # Define the WIQL query
     query = {
         "query": f"""
-        SELECT [System.Id], [System.Title], [System.State], [System.AssignedTo], [System.TeamProject]
+        SELECT [System.Id], [System.Title], [System.State], [System.AssignedTo], [System.TeamProject], [Microsoft.VSTS.Common.Priority], [Microsoft.VSTS.Common.Severity], [Microsoft.VSTS.Scheduling.DueDate]
         FROM WorkItems
         WHERE [System.TeamProject] = '{PROJECT_NAME}'
         ORDER BY [System.ChangedDate] DESC
         """
     }
+
 
     try:
         logging.debug(f'WIQL Query URL: {url}')
@@ -70,7 +74,10 @@ def fetch_all_work_items():
                     "title": item.get("fields", {}).get("System.Title", ""),
                     "state": item.get("fields", {}).get("System.State", ""),
                     "assigned_to": item.get("fields", {}).get("System.AssignedTo", {}).get("displayName", ""),
-                    "team_project": item.get("fields", {}).get("System.TeamProject", "")
+                    "team_project": item.get("fields", {}).get("System.TeamProject", ""),
+                    "priority": item.get("fields", {}).get("Microsoft.VSTS.Common.Priority", ""),
+                    "severity": item.get("fields", {}).get("Microsoft.VSTS.Common.Severity", ""),
+                    "due_date": item.get("fields", {}).get("Microsoft.VSTS.Scheduling.DueDate", "")
                 }
                 for item in all_work_items
             ]
@@ -82,4 +89,27 @@ def fetch_all_work_items():
     except requests.exceptions.RequestException as e:
         logging.error(f'Request failed: {e}')
         return None
+
+def generate_ms_project_plan(work_items):
+    """
+    Generate an MS Project plan from work items.
+    
+    Parameters:
+        work_items (list): List of work items.
+    
+    Returns:
+        MSPProject: An MS Project plan object.
+    """
+    project = MSPProject()
+    for item in work_items:
+        task = MSPTask(
+            id=item['id'],
+            name=item['title'],
+            start=datetime.strptime(item['due_date'], '%Y-%m-%dT%H:%M:%S.%fZ') if item['due_date'] else None,
+            finish=datetime.strptime(item['due_date'], '%Y-%m-%dT%H:%M:%S.%fZ') if item['due_date'] else None,
+            priority=item['priority'],
+            resource_names=item['assigned_to']
+        )
+        project.add_task(task)
+    return project
 

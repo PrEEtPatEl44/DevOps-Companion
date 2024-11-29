@@ -3,7 +3,8 @@ import requests
 from requests.auth import HTTPBasicAuth
 from helper.chatgpt import send_chat
 from app.config import AZURE_DEVOPS_REST_API_URL, AZURE_DEVOPS_GRAPH_API_URL, PAT, PROJECT_NAME
-
+import json
+from datetime import datetime, timezone, timedelta
 def get_all_users():
     """
     Fetch and clean all users from Azure DevOps Graph API.
@@ -198,68 +199,204 @@ def update_work_item_assigned_to(work_item_id, user_email):
         logging.error(f'Request failed for work item {work_item_id}: {e}')
         return None
     
+
+def calculate_priority_score(task):
+    """
+    Calculates a priority score for a task based on priority, severity, and days till due date.
+    Handles missing or empty values by assigning default values.
+    :param task: Dictionary representing a task.
+    :return: Computed priority score (higher is more critical).
+    """
+    logging.debug(f'Calculating priority score for task: {task}')
+    
+    # Extract components with defaults for missing values
+    priority = task.get("priority", 5)  # Default to lowest priority (5)
+    severity_str = task.get("severity", "3 - Medium")
+    due_date_str = task.get("due_date", None)
+
+    # Handle priority as integer
+    if not isinstance(priority, int) or priority < 1 or priority > 5:
+        priority = 5  # Default to lowest priority if invalid
+
+    # Extract severity as an integer
+    try:
+        severity = int(severity_str.split(" - ")[0])  # Extract numeric part
+    except (ValueError, AttributeError):
+        severity = 3  # Default to medium severity if invalid or missing
+
+    # Calculate days until due date
+    if due_date_str:
+        try:
+            due_date = datetime.fromisoformat(due_date_str.replace("Z", "+00:00"))  # Convert to aware datetime
+        except ValueError:
+            due_date = datetime.now(timezone.utc) + timedelta(days=30)  # Default to 30 days from now if invalid
+    else:
+        due_date = datetime.now(timezone.utc) + timedelta(days=30)  # Default to 30 days from now if missing
+
+    # Calculate days remaining
+    current_time = datetime.now(timezone.utc)  # Use timezone-aware current UTC time
+    days_until_due = max((due_date - current_time).days, 0)
+
+    # Calculate the priority score (higher score means higher urgency)
+    score = (5 - priority) * 2 + (5 - severity) * 3 + max(0, 30 - days_until_due)
+    logging.debug(f'Priority score for task {task["id"] if "id" in task else "unknown"}: {score}')
+    return score
+
+
+def calculate_total_priority_by_user(all_tasks, assignments):
+    """
+    Calculates the total priority score for each user based on their assigned tasks.
+    :param all_tasks: List of all tasks with their current priority scores.
+    :param assignments: Dictionary mapping users (emails) to their assigned tasks.
+    :return: A dictionary with users' emails as keys and their total priority scores as values.
+    """
+    total_priority_by_user = {}
+    
+    # Initialize priority scores for all users
+    for user in assignments.keys():
+        total_priority_by_user[user] = 0
+
+    # Sum up priority scores for each user's tasks
+    for task in all_tasks:
+        assigned_user = task.get("assigned_to")
+        if assigned_user in total_priority_by_user:
+            total_priority_by_user[assigned_user] += task.get("priority_score", 0)
+
+    return total_priority_by_user
+
+def validate_and_parse_json(data):
+    """
+    Validates and parses a JSON string into a dictionary. If invalid, returns an empty dictionary.
+    :param data: The JSON string or dictionary.
+    :return: A dictionary parsed from the JSON string or the original dictionary.
+    """
+    if isinstance(data, dict):  # If it's already a dictionary, return it as is
+        return data
+    elif isinstance(data, str) and data.strip():  # If it's a string, try parsing it as JSON
+        try:
+            return json.loads(data)
+        except json.JSONDecodeError:
+            logging.warning(f"Invalid JSON string: {data}. Defaulting to empty dictionary.")
+            return {}
+    else:
+        logging.warning(f"Unexpected data type: {type(data)}. Defaulting to empty dictionary.")
+        return {}
+
 def generate_gpt_task_assignment(unassigned_work_items, all_tasks):
     """
-    Generates task assignments using GPT-4.
+    Generates task assignments using GPT-4, considering a calculated priority score.
     :param unassigned_work_items: List of unassigned work items.
-    :param all_tasks: List of all tasks.
+    :param all_tasks: Dictionary containing tasks under the 'workItems' key.
     :return: Generated task assignments as a string.
     """
+    logging.debug(f'Generating GPT task assignment for unassigned work items: {unassigned_work_items}')
+    logging.debug(f'Raw all_tasks input: {all_tasks}')
+    
+    # Extract the list of tasks from 'workItems'
+    if isinstance(all_tasks, dict) and "workItems" in all_tasks:
+        tasks = all_tasks["workItems"]
+    else:
+        logging.warning("all_tasks does not contain 'workItems', defaulting to empty list.")
+        tasks = []
+
+    if isinstance(unassigned_work_items, dict) and "workItems" in unassigned_work_items:
+        unassigned_work_items = unassigned_work_items["workItems"]
+    else:
+        logging.warning("unassigned_work_items does not contain 'workItems', defaulting to empty list.")
+        unassigned_work_items = []
+
+    print(f"Extracted tasks from workItems: {tasks}")
+
+    # Ensure all tasks are dictionaries
+    tasks = [validate_and_parse_json(task) for task in tasks]
+    unassigned_work_items = [validate_and_parse_json(item) for item in unassigned_work_items]
+
+    print(f"Validated all_tasks: {tasks}")
+
+    # Calculate priority scores for all tasks
+    for task in tasks:
+        task["priority_score"] = calculate_priority_score(task)
+
+    print(f"All tasks after calculating priority scores: {tasks}")
+
+    # Assign default values instead of removing fields
+    tasks_with_defaults = []
+    for task in tasks:
+        # Create a new task dictionary with defaults assigned
+        task_with_defaults = {
+            "id": task.get("id", None),
+            "title": task.get("title", "No Title"),
+            "state": task.get("state", "New"),
+            "assigned_to": task.get("assigned_to", "Unassigned"),
+            "team_project": task.get("team_project", "Unknown Project"),
+            "priority_score": task.get("priority_score", 0),  # Keep calculated score
+        }
+        tasks_with_defaults.append(task_with_defaults)
+
+    print(f"Tasks with defaults applied: {tasks_with_defaults}")
+
+    # Compute user workload and total priority score
     assignment_count_per_person = get_work_item_counts_for_all_users()
+    total_priority_by_user = calculate_total_priority_by_user(tasks_with_defaults, assignment_count_per_person)
+
+    print(f"Assignment count per person: {assignment_count_per_person}")
+    print(f"Total priority score by user: {total_priority_by_user}")
+
     prompt = (
-        f"Analyze the unassigned work item(s): {unassigned_work_items}. "
-        f"Consider the task counts currently assigned to each person: {assignment_count_per_person}. "
-        f"Take into account all tasks and their assignments: {all_tasks}. "
-        f"Based on availability and expertise, determine 3 people who should be assigned the unassigned tasks. "
-        f"Determine expertise from the tasks that the user is assigned to. "
-        f"Ensure assignments are balanced and align with each individual's expertise and workload. "
-        f"DO NOT INCLUDE ANYTHING BUT THE EMAIL OF USER and a short message explaining why they are the best fit for the task."
+        f"Analyze the following unassigned work item(s): {unassigned_work_items}. "
+        f"Current task assignments are as follows: {assignment_count_per_person}. "
+        f"Each task in {tasks_with_defaults} has a 'priority_score', calculated based on its priority, severity, "
+        f"and the number of days until the due date. Higher scores indicate greater urgency and importance. "
+        f"The total priority score for each user is as follows: {total_priority_by_user}. "
+        f"Your task is to recommend 3 individuals to be assigned the unassigned tasks, ensuring: "
+        f"- The first two recommendations are balanced to prevent overloading any one person. "
+        f"- Assignments align with expertise based on current tasks. "
+        f"- The third recommendation should be someone with a lot of tasks to ensure critical tasks are among more seniors (Mention that user balances lots of task showing capability to handle critical taks). "
+        f"Take into account the total priority score of tasks already assigned to each person, "
+        f"so that assignments are equitable based on both task count and overall priority importance. "
+        f"Provide only the email of each recommended individual and a concise explanation of your reasoning, "
+        f"which must include task count, total priority importance, and priority score considerations. Do not include anything else in your response."
     )
 
+
+    print(f"Generated prompt for GPT: {prompt}")
 
     schema = {
         "name": "task_assignment_response",
         "schema": {
             "type": "object",
             "properties": {
-            "assignments": {
-                "type": "array",
-                "description": "List of individuals assigned to tasks",
-                "items": {
-                "type": "object",
-                "properties": {
-                    "email": {
-                    "type": "string",
-                    "description": "Email of the user selected for the assignment"
-                    },
-                    "reason": {
-                    "type": "string",
-                    "description": "A short explanation of why the user is the best fit for the task"
+                "assignments": {
+                    "type": "array",
+                    "description": "List of individuals assigned to tasks",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "email": {
+                                "type": "string",
+                                "description": "Email of the user selected for the assignment"
+                            },
+                            "reason": {
+                                "type": "string",
+                                "description": "A short explanation of why the user is the best fit for the task"
+                            }
+                        },
+                        "required": [
+                            "email",
+                            "reason"
+                        ],
+                        "additionalProperties": False
                     }
-                },
-                "required": [
-                    "email",
-                    "reason"
-                ],
-                "additionalProperties": False
                 }
-            }
             },
-            "$defs": {},
             "required": [
-            "assignments"
+                "assignments"
             ],
             "additionalProperties": False
         },
         "strict": True
-        }
+    }
+
+    print(f"Generated schema for GPT: {schema}")
     
-  
-
-
     return send_chat(prompt, context="Task assignment logic", model="gpt-4o-mini", schema=schema)
-
-
-
-
-
