@@ -3,7 +3,9 @@ from app.automated_task_assignment import get_all_users, fetch_unassigned_tasks,
 from app.status_report import fetch_pending_tasks
 from flask_cors import CORS
 from app.stats import count_work_items_by_state, count_work_items_by_assignment, count_work_items_by_type
-from app.project_plan import fetch_all_work_items
+from app.project_plan import fetch_all_work_items,generate_ms_project_plan
+
+
 app = Flask(__name__)
 CORS(app)
 
@@ -61,7 +63,7 @@ def generate_gpt_task_assignment_route(task_id):
     """
     if not task_id:
         return jsonify({'error': 'Missing task_id parameter'}), 400
-
+    
     try:
         assignments = generate_gpt_task_assignment(task_id, fetch_all_work_items())
         return jsonify(assignments)
@@ -109,7 +111,7 @@ def count_work_items_by_type_route():
 def receive_token():
     data = request.get_json()
     access_token = data.get('access_token')
-    
+    print(access_token)
     if access_token:
         print(f"Received token: {access_token}")
         return jsonify({"message": "Token received successfully", "status": "success"}), 200
@@ -166,4 +168,3 @@ def generate_gpt_task_assignment_route_all():
 if __name__ == '__main__':
     app.run(debug=True)
 
-#/api/automated_task_assignment/update_work_item/1012/preet442727@outlook.com
