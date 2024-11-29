@@ -1,5 +1,5 @@
 from flask import Flask, jsonify, request
-from app.automated_task_assignment import get_all_users, fetch_unassigned_tasks, get_work_item_counts_for_all_users, generate_gpt_task_assignment
+from app.automated_task_assignment import get_all_users, fetch_unassigned_tasks, get_work_item_counts_for_all_users, generate_gpt_task_assignment, update_work_item_assigned_to
 from app.status_report import fetch_pending_tasks
 from flask_cors import CORS
 from app.stats import count_work_items_by_state, count_work_items_by_assignment, count_work_items_by_type
@@ -48,7 +48,7 @@ def update_work_item(work_item_id, user_email):
     if not work_item_id or not user_email:
         return jsonify({'error': 'Missing work_item_id or user_email'}), 400
 
-    result = generate_gpt_task_assignment(work_item_id, user_email)
+    result = update_work_item_assigned_to(work_item_id, user_email)
     if result:
         return jsonify(result)
     else:
@@ -118,7 +118,50 @@ def receive_token():
 
 
 
+@app.route('/api/automated_task_assignment/bulk_update', methods=['POST'])
+def bulk_update():
+    data = request.json  # Expecting a list of { taskId: email } pairs
+    results = []
+    
+    for task in data:
+        task_id = task.get('taskId')
+        email = task.get('email')
+        
+        result = update_work_item_assigned_to(task_id, email)
+        
+        #success = True  # Assume success for demonstration
 
+        if result:
+            results.append({task_id: "Assigned"})
+        else:
+            results.append({task_id: "Failed"})
+    
+    return jsonify(results), 200
+
+@app.route('/api/status_report/generate_gpt_task_assignment', methods=['POST'])
+def generate_gpt_task_assignment_route_all():
+    """
+    Flask route to generate task assignments using GPT for single or multiple task IDs.
+    """
+    data = request.get_json()
+    
+   
+    task_ids = data.get('task_id') or data.get('task_ids')
+    if not task_ids:
+        return jsonify({'error': 'Missing task_id or task_ids parameter'}), 400
+
+    if isinstance(task_ids, str):
+        task_ids = [task_ids]
+
+    try:
+        assignments = []
+        for task_id in task_ids:
+            task_assignment = generate_gpt_task_assignment(task_id, fetch_all_work_items())
+            assignments.append({task_id: task_assignment})
+        
+        return jsonify(assignments)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)
