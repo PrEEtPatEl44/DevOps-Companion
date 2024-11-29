@@ -1,18 +1,26 @@
 import os
 from openai import OpenAI
+import json
+from flask import Flask, jsonify, request
 
 # Initialize OpenAI client
+# Load API key from a text file
+with open('apikeys.txt', 'r') as file:
+    api_key = file.read().strip()
+
 client = OpenAI(
-    api_key="REMOVED_OPENAI_KEY"
+    api_key=api_key
 )
 
 # Function to send a chat with given prompt and context
-def send_chat(prompt, context):
+def send_chat(prompt, context, model="gpt-4o-mini", schema=""):
     """
     Sends a chat message to OpenAI GPT-4 model.
     :param prompt: The user's message.
     :param context: Additional context for the conversation.
-    :return: GPT response as a string.
+    :param model: The model to use for chat completion (default is "gpt-4o-mini").
+    :param schema: Optional schema for the response format.
+    :return: GPT response as a string or a JSON object, based on the schema.
     """
     messages = [
         {"role": "system", "content": "You are a helpful assistant."},
@@ -21,14 +29,30 @@ def send_chat(prompt, context):
     if context:
         messages.insert(1, {"role": "system", "content": context})
     
-    chat_completion = client.chat.completions.create(
-        messages=messages,
-        model="gpt-4o",
-    )
+    # Define response format based on whether a schema is provided
+    if not schema:
+        response_format = {"type": "text"}
+    else:
+        response_format = {"type": "json_schema", "json_schema": schema}
 
-    # Access the message content safely
-    content = chat_completion.choices[0].message.content
-    return content
+    try:
+        chat_completion = client.chat.completions.create(
+            messages=messages,
+            model=model,
+            response_format=response_format
+        )
+    except Exception as e:
+        raise RuntimeError(f"Error during chat completion: {str(e)}")
+
+    if response_format["type"] == "object":
+        return chat_completion
+    else:
+        # Access the message content safely
+        content = chat_completion.choices[0].message.content
+        return content
+
+
+
 
 # Function to generate an email using GPT
 def generate_gpt_email(to, from_, context):
@@ -51,5 +75,7 @@ def generate_subject_line(body):
     """
     prompt = f"Create a concise and professional subject line for this email body: {body}"
     return send_chat(prompt, None)
+
+
 
 
