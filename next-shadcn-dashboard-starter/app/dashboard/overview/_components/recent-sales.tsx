@@ -9,7 +9,9 @@ export function RecentSales() {
   useEffect(() => {
     // Fetch data from the API
     const fetchData = async () => {
-      const response = await fetch('http://127.0.0.1:5000/api/automated_task_assignment/task_counts');
+      const response = await fetch(
+        'http://127.0.0.1:5000/api/automated_task_assignment/task_counts'
+      );
       const data = await response.json();
       setTaskData(data);
     };
@@ -19,7 +21,20 @@ export function RecentSales() {
 
   // If the data is not yet loaded, you can return a loading state
   if (!taskData) {
-    return <div>Loading...</div>;
+    return (
+      <div
+        className="flex h-full items-center justify-center"
+        style={{ margin: '20%' }}
+      >
+        <img
+          className="mx-auto"
+          height={100}
+          width={100}
+          src="/Loader.gif"
+          alt="Loader"
+        />
+      </div>
+    );
   }
 
   return (
@@ -31,13 +46,17 @@ export function RecentSales() {
           <div className="flex items-center" key={email}>
             <Avatar className="h-9 w-9">
               <AvatarImage src="/avatars/01.png" alt="Avatar" />
-              <AvatarFallback>{displayName?.slice(0, 2).toUpperCase()}</AvatarFallback>
+              <AvatarFallback>
+                {displayName?.slice(0, 2).toUpperCase()}
+              </AvatarFallback>
             </Avatar>
             <div className="ml-4 space-y-1">
               <p className="text-sm font-medium leading-none">{displayName}</p>
               <p className="text-sm text-muted-foreground">{email}</p>
             </div>
-            <div className="ml-auto font-medium">Working on {taskCount} tasks</div>
+            <div className="ml-auto font-medium">
+              Working on {taskCount} tasks
+            </div>
           </div>
         );
       })}
