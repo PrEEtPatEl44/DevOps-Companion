@@ -27,6 +27,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
+import { useEffect, useState } from "react" 
 import {
   Table,
   TableBody,
@@ -36,48 +37,10 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import PageContainer from "@/components/layout/page-container"
+import { Risk } from "@/constants/data"
 
-const data: Payment[] = [
-  {
-    id: "m5gr84i9",
-    amount: 316,
-    status: "success",
-    email: "ken99@yahoo.com",
-  },
-  {
-    id: "3u1reuv4",
-    amount: 242,
-    status: "success",
-    email: "Abe45@gmail.com",
-  },
-  {
-    id: "derv1ws0",
-    amount: 837,
-    status: "processing",
-    email: "Monserrat44@gmail.com",
-  },
-  {
-    id: "5kma53ae",
-    amount: 874,
-    status: "success",
-    email: "Silas22@gmail.com",
-  },
-  {
-    id: "bhqecj4p",
-    amount: 721,
-    status: "failed",
-    email: "carmella@hotmail.com",
-  },
-]
 
-export type Payment = {
-  id: string
-  amount: number
-  status: "pending" | "processing" | "success" | "failed"
-  email: string
-}
-
-export const columns: ColumnDef<Payment>[] = [
+export const columns: ColumnDef<Risk>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -101,48 +64,50 @@ export const columns: ColumnDef<Payment>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "status",
-    header: "Status",
-    cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("status")}</div>
-    ),
+    accessorKey: "id",
+    header: "ID",
+    cell: ({ row }) => <div>{row.getValue("id")}</div>,
   },
   {
-    accessorKey: "email",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Email
-          <ArrowUpDown />
-        </Button>
-      )
-    },
-    cell: ({ row }) => <div className="lowercase">{row.getValue("email")}</div>,
+    accessorKey: "title",
+    header: "Title",
+    cell: ({ row }) => row.getValue("title")
   },
   {
-    accessorKey: "amount",
-    header: () => <div className="text-right">Amount</div>,
-    cell: ({ row }) => {
-      const amount = parseFloat(row.getValue("amount"))
-
-      // Format the amount as a dollar amount
-      const formatted = new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: "USD",
-      }).format(amount)
-
-      return <div className="text-right font-medium">{formatted}</div>
+    accessorKey: "state",
+    header: "State",
+    cell: ({ row }) => row.getValue("state")
+  },
+  {
+    accessorKey: "assignedTo",
+    header: "Assigned To ",
+    cell: ({ row }) => row.getValue("assignedTo")
+  },
+  {
+    accessorKey: "dueDate",
+    header: "Due Date",
+    cell: ({ row }) => row.getValue("dueDate")
+  },
+  {
+    accessorKey: "priorityScore",
+    header: ({column})=>{
+        return(  <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            Priority Score
+            <ArrowUpDown />
+          </Button>)
     },
+    cell: ({ row }) => <div>{row.getValue("priorityScore")}</div>,
+    
   },
   {
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
       const payment = row.original
-
+ 
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -153,22 +118,18 @@ export const columns: ColumnDef<Payment>[] = [
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(payment.id)}
-            >
-              Copy payment ID
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>View customer</DropdownMenuItem>
-            <DropdownMenuItem>View payment details</DropdownMenuItem>
+            <DropdownMenuItem >Send Email about task</DropdownMenuItem>
+            <DropdownMenuItem >Send Follow-up Email to asignee</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       )
     },
   },
+ 
 ]
 
 export default function DataTableDemo() {
+    const [Risks, setRisks] = useState<Risk[]>([]);
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -176,9 +137,9 @@ export default function DataTableDemo() {
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = React.useState({})
-
+  const [isLoading, setIsLoading] = useState(false);
   const table = useReactTable({
-    data,
+    data: Risks,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -195,16 +156,69 @@ export default function DataTableDemo() {
       rowSelection,
     },
   })
+  useEffect(() => {
+    const fetchRisks = async () => {
+        setIsLoading(true);
+       try {
+        const response = await fetch('http://127.0.0.1:5000/api/risk/filter_risk_items');
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+  
+        // Parse response
+        const data = await response.json();
+        const parsedData = JSON.parse(data);
+        //console.log('Parsed data:', parsedData);
+  
+        // Check if `data` has an `items` key and ensure `items` is an array
+        if ( parsedData.items ) {
+         // console.log('Valid items array:', data.items);
+  
+          const fetchedRisks = parsedData.items.map((item: any) => ({
+            id: item.id,
+            title: item.title,
+            state: item.state,
+            assignedTo: item.assigned_to,
+            project: item.team_project,
+            priority: item.priority,
+            severity: item.severity,
+            dueDate: item.due_date,
+            priorityScore: item.priority_score,
+          }));
+          //console.log(fetchedRisks);
+          setRisks(fetchedRisks);
+        } else {
+          console.error('`items` is either missing or not an array:', data.items);
+        }
+      } catch (error) {
+         console.error('Error fetching risks:', error);
+       }finally {
+        setIsLoading(false); // Stop loading
+      }
+    };
+  
+    fetchRisks();
+  }, []);
+  
+  
+
 
   return (
     <PageContainer>
+         {isLoading && (
+  <div className="loading-overlay">
+    <div className="loading-content">
+      <img src="/Loader.gif" alt="Loading..." />
+    </div>
+  </div>
+)}
     <div className="w-full text-black">
       <div className="flex items-center py-4">
         <Input
-          placeholder="Filter emails..."
-          value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
+          placeholder="Filter title..."
+          value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
-            table.getColumn("email")?.setFilterValue(event.target.value)
+            table.getColumn("title")?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />

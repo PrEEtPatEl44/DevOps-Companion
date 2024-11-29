@@ -9,7 +9,7 @@ with open('apikeys.txt', 'r') as file:
     api_key = file.read().strip()
 
 client = OpenAI(
-    api_key=api_key
+    api_key='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'
 )
 
 # Function to send a chat with given prompt and context

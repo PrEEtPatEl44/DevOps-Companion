@@ -106,11 +106,15 @@ export type Task = {
 };
 
 export type Risk = {
-  id: number;
-  url: string;
-  workItemType: string;
-  state: string;
-  title: string;
+  id: number,
+  title: string,
+  state: string,
+  assignedTo: string,
+  project: string,
+  priority: string,
+  severity: string,
+  dueDate: string,
+  priorityScore: number,
 };
 export type Employee = {
   id: number;
