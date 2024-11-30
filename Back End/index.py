@@ -225,14 +225,16 @@ def generate_email_ai():
     """
     data = request.get_json()
     to = data.get('to')
+    to_name = data.get('to_name')
     from_ = data.get('from')
+    from_name = data.get('from_name')
     context = data.get('context')
-
+    
     if not to or not from_ or not context:
         return jsonify({'error': 'Missing to, from, or context parameter'}), 400
 
     try:
-        email = generate_gpt_email(to, from_, context)
+        email = generate_gpt_email(to, to_name, from_, from_name, context)
         subject = generate_subject_line(context)
         return jsonify({'email': email, 'subject': subject})
     except Exception as e:

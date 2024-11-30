@@ -55,7 +55,7 @@ def send_chat(prompt, context, model="gpt-4o-mini", schema=""):
 
 
 # Function to generate an email using GPT
-def generate_gpt_email(to, from_, context):
+def generate_gpt_email(to, to_name, from_, from_name, context):
     """
     Generates an email using GPT-4.
     :param to: The recipient of the email.
@@ -63,7 +63,7 @@ def generate_gpt_email(to, from_, context):
     :param context: Context or key details for the email content.
     :return: Generated email as a string.
     """
-    prompt = f"Generate a professional email to {to} from {from_}. Context: {context}. DO NOT INCLUDE ANYTHING BUT EMAIL BODY."
+    prompt = f"Generate a professional email to {to_name} from {from_name}. Context: {context}. DO NOT INCLUDE ANYTHING BUT EMAIL BODY. DO NOT INCLUDE THE SUBJECT INSIDE THIS EMAIL BODY."
     return send_chat(prompt, None)
 
 # Function to generate a subject line from a body
@@ -73,7 +73,7 @@ def generate_subject_line(body):
     :param body: The content of the email body.
     :return: Generated subject line as a string.
     """
-    prompt = f"Create a concise and professional subject line for this email body: {body}"
+    prompt = f"Create a concise and professional subject line for this email body: {body}. DO NOT INCLUDE THE 'SUBJECT:' TOPIC IN THE SUBJECT LINE."
     return send_chat(prompt, None)
 
 
