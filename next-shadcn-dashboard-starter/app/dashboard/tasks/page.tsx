@@ -44,153 +44,7 @@ import { Modal } from '@/components/ui/modal';
 import { DialogContent, DialogTitle } from '@radix-ui/react-dialog';
 import { X } from 'lucide-react';
 
-// const data: Payment[] = [
-//   {
-//     id: "m5gr84i9",
-//     amount: 316,
-//     status: "success",
-//     email: "ken99@yahoo.com",
-//   },
-//   {
-//     id: "3u1reuv4",
-//     amount: 242,
-//     status: "success",
-//     email: "Abe45@gmail.com",
-//   },
-//   {
-//     id: "derv1ws0",
-//     amount: 837,
-//     status: "processing",
-//     email: "Monserrat44@gmail.com",
-//   },
-//   {
-//     id: "5kma53ae",
-//     amount: 874,
-//     status: "success",
-//     email: "Silas22@gmail.com",
-//   },
-//   {
-//     id: "bhqecj4p",
-//     amount: 721,
-//     status: "failed",
-//     email: "carmella@hotmail.com",
-//   },
-//   {
-//     id: "derv1ws0",
-//     amount: 837,
-//     status: "processing",
-//     email: "Monserrat44@gmail.com",
-//   },
-//   {
-//     id: "5kma53ae",
-//     amount: 874,
-//     status: "success",
-//     email: "Silas22@gmail.com",
-//   },
-//   {
-//     id: "bhqecj4p",
-//     amount: 721,
-//     status: "failed",
-//     email: "carmella@hotmail.com",
-//   },
-//   {
-//     id: "derv1ws0",
-//     amount: 837,
-//     status: "processing",
-//     email: "Monserrat44@gmail.com",
-//   },
-//   {
-//     id: "5kma53ae",
-//     amount: 874,
-//     status: "success",
-//     email: "Silas22@gmail.com",
-//   },
-//   {
-//     id: "bhqecj4p",
-//     amount: 721,
-//     status: "failed",
-//     email: "carmella@hotmail.com",
-//   },
-//   {
-//     id: "derv1ws0",
-//     amount: 837,
-//     status: "processing",
-//     email: "Monserrat44@gmail.com",
-//   },
-//   {
-//     id: "5kma53ae",
-//     amount: 874,
-//     status: "success",
-//     email: "Silas22@gmail.com",
-//   },
-//   {
-//     id: "bhqecj4p",
-//     amount: 721,
-//     status: "failed",
-//     email: "carmella@hotmail.com",
-//   },
-//   {
-//     id: "derv1ws0",
-//     amount: 837,
-//     status: "processing",
-//     email: "Monserrat44@gmail.com",
-//   },
-//   {
-//     id: "5kma53ae",
-//     amount: 874,
-//     status: "success",
-//     email: "Silas22@gmail.com",
-//   },
-//   {
-//     id: "bhqecj4p",
-//     amount: 721,
-//     status: "failed",
-//     email: "carmella@hotmail.com",
-//   },
-//   {
-//     id: "derv1ws0",
-//     amount: 837,
-//     status: "processing",
-//     email: "Monserrat44@gmail.com",
-//   },
-//   {
-//     id: "5kma53ae",
-//     amount: 874,
-//     status: "success",
-//     email: "Silas22@gmail.com",
-//   },
-//   {
-//     id: "bhqecj4p",
-//     amount: 721,
-//     status: "failed",
-//     email: "carmella@hotmail.com",
-//   },
-//   {
-//     id: "derv1ws0",
-//     amount: 837,
-//     status: "processing",
-//     email: "Monserrat44@gmail.com",
-//   },
-//   {
-//     id: "5kma53ae",
-//     amount: 874,
-//     status: "success",
-//     email: "Silas22@gmail.com",
-//   },
-//   {
-//     id: "bhqecj4p",
-//     amount: 721,
-//     status: "failed",
-//     email: "carmella@hotmail.com",
-//   },
-// ]
 
-// export type Payment = {
-//   id: string
-//   amount: number
-//   status: "pending" | "processing" | "success" | "failed"
-//   email: string
-// }
 
 export const columns: ColumnDef<Task>[] = [
   {
@@ -265,51 +119,7 @@ export const columns: ColumnDef<Task>[] = [
     cell: ({ row }) => <CellAction data={row.original} />
   }
   
-  // {
-  //   accessorKey: "amount",
-  //   header: () => <div className="text-right">Amount</div>,
-  //   cell: ({ row }) => {
-  //     const amount = parseFloat(row.getValue("amount"))
-
-  //     // Format the amount as a dollar amount
-  //     const formatted = new Intl.NumberFormat("en-US", {
-  //       style: "currency",
-  //       currency: "USD",
-  //     }).format(amount)
-
-  //     return <div className="text-right font-medium">{formatted}</div>
-  //   },
-  // },
   
-  // {
-  //   id: "actions",
-  //   enableHiding: false,
-  //   cell: ({ row }) => {
-  //     const payment = row.original
-
-  //     return (
-  //       <DropdownMenu>
-  //         <DropdownMenuTrigger asChild>
-  //           <Button variant="ghost" className="h-8 w-8 p-0">
-  //             <span className="sr-only">Open menu</span>
-  //             <MoreHorizontal />
-  //           </Button>
-  //         </DropdownMenuTrigger>
-  //         <DropdownMenuContent align="end">
-  //           <DropdownMenuLabel>Actions</DropdownMenuLabel>
-  //           <DropdownMenuItem
-  //             onClick={() => navigator.clipboard.writeText(payment.id)}
-  //           >
-  //             Copy payment ID
-  //           </DropdownMenuItem>
-  //           <DropdownMenuSeparator />
-  //           <DropdownMenuItem>View customer</DropdownMenuItem>
-  //           <DropdownMenuItem>View payment details</DropdownMenuItem>
-  //         </DropdownMenuContent>
-  //       </DropdownMenu>
-  //     )
-  //   },
-  // },
 ]
 
 export default function DataTableDemo() {
@@ -325,47 +135,46 @@ export default function DataTableDemo() {
   const [idsArray, setIdsArray] = useState([]);
   const [responseData, setResponseData] = useState<{ [key: string]: string }[] | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const handleButtonClick = () => {
+  const [isLoading, setIsLoading] = useState(false);
+  const handleButtonClick = async () => {
     const filteredRows = table.getFilteredSelectedRowModel().rows;
-  
+
     if (filteredRows.length > 0) {
-      // Extract IDs from selected rows
+      setIsLoading(true); // Start loading
       const taskIds = filteredRows.map((row) => row.original.id);
-  
-      // Send POST request using Fetch API
-      fetch('http://127.0.0.1:5000/api/status_report/generate_gpt_task_assignment', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          task_ids: taskIds, // Send the array of IDs
-        }),
-      })
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error('Network response was not ok');
+
+      try {
+        const response = await fetch(
+          'http://127.0.0.1:5000/api/status_report/generate_gpt_task_assignment',
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ task_ids: taskIds }),
           }
-          console.log(response.json)
-          return response.json();
-        })
-        .then((data) => {
-          setResponseData(data); 
-          setIsModalOpen(true);
-          toast.success('Task assignment generated successfully!');
-          console.log('Success:', data);
-        })
-        .catch((error) => {
-          toast.error('Error generating task assignments');
-          console.error('Error:', error);
-        });
+        );
+
+        if (!response.ok) throw new Error('Network response was not ok');
+
+        const data = await response.json();
+        setResponseData(data);
+        setIsModalOpen(true);
+        toast.success('Task assignment generated successfully!');
+      } catch (error) {
+        toast.error('Error generating task assignments');
+        console.error('Error:', error);
+      } finally {
+        setIsLoading(false); // Stop loading
+      }
     } else {
       toast.error('Please select at least one item to assign.');
     }
   };
-  
+
   useEffect(() => {
     const fetchTasks = async () => {
+      setIsLoading(true); // Start loading
       try {
         const response = await fetch(
           'http://127.0.0.1:5000/api/automated_task_assignment/fetch_unassigned_tasks'
@@ -377,29 +186,22 @@ export default function DataTableDemo() {
           url: item.url,
           workItemType: item.fields['System.WorkItemType'],
           state: item.fields['System.State'],
-          title: item.fields['System.Title']
+          title: item.fields['System.Title'],
         }));
 
         setTasks(fetchedTasks);
       } catch (error) {
         console.error('Error fetching tasks:', error);
+      } finally {
+        setIsLoading(false); // Stop loading
       }
     };
 
     fetchTasks();
   }, []);
-  const removeTask = async (taskId: string) => {
-    try {
-      setResponseData((prevData) =>
-      prevData ? prevData.filter((task) => !task.hasOwnProperty(taskId)) : []
-      );
-    } catch (error) {
-      toast.error(`Error removing task: ${String(error)}`);
-    }
-  }
-  
+
   const assignTask = async (taskId: string, email: string) => {
-    console.log("clicked");
+    setIsLoading(true); // Start loading
     try {
       const url = `http://127.0.0.1:5000/api/automated_task_assignment/update_work_item/${taskId}/${email}`;
       const response = await fetch(url, {
@@ -409,58 +211,69 @@ export default function DataTableDemo() {
 
       if (response.ok) {
         toast.success(`Task successfully assigned to ${email}`);
-        console.log(`Task assigned to ${email}`);
         setResponseData((prevData) =>
           prevData ? prevData.filter((task) => !task.hasOwnProperty(taskId)) : []
         );
       } else {
-        console.error('Failed to assign task');
+        throw new Error('Failed to assign task');
       }
     } catch (error) {
-      console.error('Error assigning task:', error);
+      toast.error(`Error assigning task: ${(error as Error).message}`);
+      console.error('Error:', error);
+    } finally {
+      setIsLoading(false); // Stop loading
     }
   };
 
-  
   const assignAllTasks = async () => {
+    if (!responseData || responseData.length === 0) return;
+
+    setIsLoading(true); // Start loading
     try {
-      if (responseData) {
-        // Prepare the data as an array of { taskId, email } objects
-        const tasksToAssign = responseData.map((task: { [key: string]: string }) => {
-          const taskId = Object.keys(task)[0];
-          const taskAssignments = JSON.parse(task[taskId]).assignments;
-          const email = taskAssignments[0]?.email;
-  
-          return { taskId, email };
-        });
-  
-        // Send a single POST request to the bulk update API
-        const response = await fetch('http://127.0.0.1:5000/api/automated_task_assignment/bulk_update', {
+      const tasksToAssign = responseData.map((task: { [key: string]: string }) => {
+        const taskId = Object.keys(task)[0];
+        const taskAssignments = JSON.parse(task[taskId]).assignments;
+        const email = taskAssignments[0]?.email;
+
+        return { taskId, email };
+      });
+
+      const response = await fetch(
+        'http://127.0.0.1:5000/api/automated_task_assignment/bulk_update',
+        {
           method: 'POST',
           mode: 'cors',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify(tasksToAssign),
-        });
-  
-        if (response.ok) {
-          const result = await response.json();
-          console.log('Bulk assignment result:', result);
-          toast.success('All tasks successfully assigned');
-          setResponseData([]);
-          
-        } else {
-          console.error('Failed to assign tasks in bulk');
-          toast.error('Error assigning all tasks');
         }
+      );
+
+      if (response.ok) {
+        const result = await response.json();
+        toast.success('All tasks successfully assigned');
+        setResponseData([]);
+        console.log('Bulk assignment result:', result);
+      } else {
+        throw new Error('Failed to assign tasks in bulk');
       }
     } catch (error) {
-      console.error('Error assigning tasks:', error);
       toast.error('Error assigning all tasks');
+      console.error('Error:', error);
+    } finally {
+      setIsLoading(false); // Stop loading
     }
   };
-
+  const removeTask = async (taskId: string) => {
+    try {
+      setResponseData((prevData) =>
+      prevData ? prevData.filter((task) => !task.hasOwnProperty(taskId)) : []
+      );
+    } catch (error) {
+      toast.error(`Error removing task: ${String(error)}`);
+    }
+  }
   const table = useReactTable({
     data:tasks,
     columns,
@@ -482,6 +295,13 @@ export default function DataTableDemo() {
   
   return (
     <PageContainer>
+       {isLoading && (
+  <div className="loading-overlay">
+    <div className="loading-content">
+      <img src="/Loader.gif" alt="Loading..." />
+    </div>
+  </div>
+)}
     <div className="w-full text-black">
       <div className="flex items-around justify-between py-4">
         <Input
@@ -666,3 +486,48 @@ export default function DataTableDemo() {
   )
   // const idsArray = table.getFilteredSelectedRowModel().rows.map((row) => row.original.id);
 }
+// {
+  //   accessorKey: "amount",
+  //   header: () => <div className="text-right">Amount</div>,
+  //   cell: ({ row }) => {
+  //     const amount = parseFloat(row.getValue("amount"))
+
+  //     // Format the amount as a dollar amount
+  //     const formatted = new Intl.NumberFormat("en-US", {
+  //       style: "currency",
+  //       currency: "USD",
+  //     }).format(amount)
+
+  //     return <div className="text-right font-medium">{formatted}</div>
+  //   },
+  // },
+  
+  // {
+  //   id: "actions",
+  //   enableHiding: false,
+  //   cell: ({ row }) => {
+  //     const payment = row.original
+
+  //     return (
+  //       <DropdownMenu>
+  //         <DropdownMenuTrigger asChild>
+  //           <Button variant="ghost" className="h-8 w-8 p-0">
+  //             <span className="sr-only">Open menu</span>
+  //             <MoreHorizontal />
+  //           </Button>
+  //         </DropdownMenuTrigger>
+  //         <DropdownMenuContent align="end">
+  //           <DropdownMenuLabel>Actions</DropdownMenuLabel>
+  //           <DropdownMenuItem
+  //             onClick={() => navigator.clipboard.writeText(payment.id)}
+  //           >
+  //             Copy payment ID
+  //           </DropdownMenuItem>
+  //           <DropdownMenuSeparator />
+  //           <DropdownMenuItem>View customer</DropdownMenuItem>
+  //           <DropdownMenuItem>View payment details</DropdownMenuItem>
+  //         </DropdownMenuContent>
+  //       </DropdownMenu>
+  //     )
+  //   },
+  // },
