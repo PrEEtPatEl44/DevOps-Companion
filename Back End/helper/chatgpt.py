@@ -9,7 +9,7 @@ with open('apikeys.txt', 'r') as file:
     api_key = file.read().strip()
 
 client = OpenAI(
-    api_key='REMOVED_OPENAI_KEY'
+    api_key=api_key
 )
 
 # Function to send a chat with given prompt and context
