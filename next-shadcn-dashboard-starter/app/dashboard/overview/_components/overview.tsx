@@ -15,8 +15,38 @@ import {
   CardTitle
 } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useSession } from 'next-auth/react';
+import Select from 'react-select';
+import { Modal } from '@/components/ui/modal';
 export default function OverViewPage() {
   const [taskData, setTaskData] = useState<any>(null);
+  const [emailData, setEmailData] = useState<any[]>([]); // Store email data
+  const [selectedUser, setSelectedUser] = useState<any | null>(null); // Store selected user
+  const [isModalOpen, setIsModalOpen] = useState(false); // Track modal state
+  const [loading, setLoading] = useState(false);
+  const { data: session } = useSession(); // Getting the session token
+  useEffect(() => {
+    const fetchEmails = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch('http://127.0.0.1:5000/api/automated_task_assignment/task_counts');
+        const data = await response.json();
+        const emailArray = Object.keys(data).map(key => ({
+          email: key,
+          displayName: data[key].displayName,
+          taskCount: data[key].taskCount,
+        }));
+        
+        setEmailData(emailArray);
+      } catch (error) {
+        console.error('Error fetching email data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchEmails(); 
+  }, []);
+
 
   useEffect(() => {
     // Fetch data from the API
@@ -30,6 +60,66 @@ export default function OverViewPage() {
 
     fetchData();
   }, []);
+
+
+  const generateStatusReport = async (session:any) => {
+    try {
+      // Request to generate the report
+      const response = await fetch('http://127.0.0.1:5000/api/status/generate_status_report_plan', { method: 'GET' });
+      const result = await response.json();
+      console.log(result);
+      if (result) {
+        // Create the draft email with the generated report attached
+        const attachmentPath = `./${result}`;
+        const createEmailResponse = await fetch('http://127.0.0.1:5000/api/email_sender/create_draft', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            subject: 'Daily Status Report',
+            body: 'Daily Status Report',
+            to_recipients: [selectedUser?.email], // Send to the selected user's email
+            access_token: session?.access_token,
+            attachments: [attachmentPath], // Attach the generated report
+          }),
+        });
+
+        const { draftLink } = await createEmailResponse.json();
+        if (draftLink) {
+          window.location.href = draftLink; // Redirect to draft email link
+        }
+      }
+    } catch (error) {
+      console.error('Error generating report or sending email:', error);
+    }
+  };
+
+  const modalContent = (
+    <div className="space-y-4">
+      <div>
+        <label className="block text-sm font-medium text-gray-700">Select User</label>
+        <Select
+          options={emailData.map((user) => ({
+            label: user.displayName,
+            value: user.email,
+          }))}
+          value={selectedUser}
+          onChange={setSelectedUser}
+          getOptionLabel={(e: any) => `${e.label} (${e.value})`} // Display email with name
+          placeholder="Select a user"
+        />
+      </div>
+      <div className="flex justify-end space-x-2">
+        <Button onClick={() => setIsModalOpen(false)}>Cancel</Button>
+        <Button onClick={() => generateStatusReport(session)} disabled={!selectedUser}>
+          OK
+        </Button>
+      </div>
+    </div>
+  );
+
+
   if (!taskData) {
     // Render a loading state while data is being fetched
     return <div>Loading...</div>;
@@ -43,8 +133,14 @@ export default function OverViewPage() {
           </h2>
           <div className="hidden items-center space-x-2 md:flex">
             {/* <CalendarDateRangePicker /> */}
-            <Button>Download</Button>
+            <Button onClick={() => setIsModalOpen(true)}>Generate Daily Report</Button>
           </div>
+          {/* Display Modal when it's open */}
+        {isModalOpen && (
+          <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title='Generate Report' >
+            {modalContent}
+          </Modal>
+        )}
         </div>
         <Tabs defaultValue="overview" className="space-y-4">
           <TabsList>

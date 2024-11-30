@@ -192,13 +192,14 @@ def create_draft():
     subject = data.get('subject')
     body = data.get('body')
     to_recipients = data.get('to_recipients')
+    access_token = data.get('access_token')
     attachments = data.get('attachments', None)
 
     if not subject or not body or not to_recipients:
         return jsonify({'error': 'Missing subject, body, or to_recipients parameter'}), 400
 
     # Assuming you fetch an access token for authentication
-    access_token = jwt_token  # You need to implement this function to fetch a valid token
+    #access_token = jwt_token  # You need to implement this function to fetch a valid token
 
     if not access_token:
         return jsonify({'error': 'Authentication failed. No access token provided.'}), 401
@@ -225,14 +226,16 @@ def generate_email_ai():
     """
     data = request.get_json()
     to = data.get('to')
+    to_name = data.get('to_name')
     from_ = data.get('from')
+    from_name = data.get('from_name')
     context = data.get('context')
-
+    
     if not to or not from_ or not context:
         return jsonify({'error': 'Missing to, from, or context parameter'}), 400
 
     try:
-        email = generate_gpt_email(to, from_, context)
+        email = generate_gpt_email(to, to_name, from_, from_name, context)
         subject = generate_subject_line(context)
         return jsonify({'email': email, 'subject': subject})
     except Exception as e:
