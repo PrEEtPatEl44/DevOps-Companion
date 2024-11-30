@@ -31,7 +31,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
 
     const { data: session } = useSession();
     const [emailModalOpen, setEmailModalOpen] = useState(false);
-    const [selectedUser, setSelectedUser] = useState<{ value: string; label: string } | null>(null); // Store the selected user(s)
+    const [selectedUser, setSelectedUser] = useState<{ value: string; label: string }[]>([]); // Store the selected user(s)
 
     const userOptions = emailData
         ? Object.entries(emailData).map(([email, { displayName }]) => ({
@@ -69,11 +69,13 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
             toast.error("Please select a user.");
             return;
         }
-    
+        console.log(selectedUser);
         const { title, id } = data;
         const emailData = {
-            to: selectedUser.value, // Email of the selected user
+            to: [selectedUser.values],
+            to_name: selectedUser.map(user => user.label),
             from: session?.user?.email,
+            from_name: session?.user?.name,
             context: context||`Regarding the task: ${title} (ID: ${id})`,
         };
     
@@ -102,18 +104,20 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
     };
     
 
-    const SendGeneratedEmail = async (session:any) => {
-        if (resultData) {
+    const SendGeneratedEmail = async (session: any, userEmails: string[] | null) => {
+        if (!userEmails || userEmails.length === 0) {
+            userEmails = [data.userEmail];
+            console.log(data.userEmail);
+        }
+        if (resultData ) {
             const { subject, email } = resultData;
-            const { userEmail } = data; 
-           
-        const formattedEmailBody = email.replace(/\n/g, "<br />");
             const emailData = {
                 subject: subject,
                 body: email,
-                to_recipients: userEmail,
+                to_recipients: userEmails,
                 access_token: session?.access_token,
             };
+            console.log(userEmails);
 
             try {
                 const response = await fetch("http://127.0.0.1:5000/api/email_sender/create_draft", {
@@ -123,12 +127,11 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
                     },
                     body: JSON.stringify(emailData),
                 });
-                    const result = await response.json();
-                    console.log(result.draft_link);
-                    const draftLink = result?.draft_link;
+                const result = await response.json();
+                console.log(result.draft_link);
+                window.location.href = result.draft_link;
                 if (response.ok) {
                     toast.success("Email sent successfully.");
-                    //window.location.href = draftLink
                 } else {
                     alert("Failed to send the email.");
                 }
@@ -142,13 +145,19 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
     // Sending the follow-up email to the assignee
     const handleFollowUpEmail = async () => {
         try {
-            const { userEmail, title, id } = data;
-
+            const {assignedTo, userEmail, title, id } = data;
+            // if (!session || !session.user) {
+            // throw new Error("Session is not available.");
+            // }
+            
             const emailData = {
-                to: userEmail,
-                from: session?.user?.email,
-                context: context || `Follow-up on the task: ${title} (ID: ${id})`,
+            to: userEmail,
+            to_name: assignedTo,
+            from: session?.user?.email,
+            from_name: session?.user?.name,
+            context: context || `Follow-up on the task: ${title} (ID: ${id})`,
             };
+            console.log(emailData);
 
             const response = await fetch("http://127.0.0.1:5000/api/email_sender/generate_email_ai", {
                 method: "POST",
@@ -198,7 +207,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
                     <div>
                         <div><strong>Task ID:</strong> {data.id}</div>
                         <div><strong>Title:</strong> {data.title}</div>
-                        <div><strong>Assigned To:</strong> {data.assignedTo}</div>
+                        <div><strong>Assigned To:</strong> {data.assignedTo}--({data.userEmail})</div>
                         <div><strong>Sender Email:</strong> {session?.user?.email}</div>
                     </div>
                     <Textarea
@@ -231,8 +240,8 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
                     />
                 </div>
                 <div className="modal-footer">
-                    <Button onClick={() => SendGeneratedEmail(session)}>
-                        Send Email
+                    <Button onClick={() => SendGeneratedEmail(session, selectedUser.map(user => user.value))}>
+                        Send Emails
                     </Button>
                     <Button variant="outline" onClick={() => setResultModalOpen(false)}>
                         Close
@@ -247,13 +256,15 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
             <div><strong>Title:</strong> {data.title}</div>
             <div><strong>Sender Email:</strong> {session?.user?.email}</div>
             <div className="mt-4">
-                <label className="font-medium">Select User:</label>
-                <Select
-                    options={userOptions}
-                    value={selectedUser}
-                    onChange={setSelectedUser}
-                    placeholder="Select a user..."
-                />
+                <label className="font-medium">Select Users:</label>
+               
+            <Select
+                isMulti
+                options={userOptions}
+                value={selectedUser}
+                onChange={(selectedOptions) => setSelectedUser(selectedOptions as { value: string; label: string }[])}
+                placeholder="Select users..."
+            />
             </div>
             <label className="font-medium">Select Context:</label>
             <Textarea

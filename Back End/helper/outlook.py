@@ -11,7 +11,9 @@ class OutlookEmailSender:
     def send_email(self, subject, body, to_recipients, attachments=None):
         encoded_subject = urllib.parse.quote(subject)
         encoded_body = urllib.parse.quote(body)
-        encoded_to_recipients = urllib.parse.quote(to_recipients)#work around does not support multiple recipients
+        #encoded_to_recipients = urllib.parse.quote(to_recipients)#work around does not support multiple recipients
+        encoded_to_recipients = urllib.parse.quote(','.join(to_recipients))
+
         email_msg = {
             'Message': {
                 'Subject': subject,
@@ -27,8 +29,9 @@ class OutlookEmailSender:
 
         if attachments:
             for attachment in attachments:
+                print(attachment)
                 with open(attachment, 'rb') as file:
-                    content_bytes = file.read()
+                    content_bytes = file.read()                    
                     content_base64 = base64.b64encode(content_bytes).decode()
                     email_msg['Message']['Attachments'].append({
                         '@odata.type': '#microsoft.graph.fileAttachment',
