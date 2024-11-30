@@ -376,6 +376,10 @@ def generate_gpt_task_assignment(unassigned_work_items, all_tasks):
                                 "type": "string",
                                 "description": "Email of the user selected for the assignment"
                             },
+                            "display_name": {
+                                "type": "string",
+                                "description": "Display name of the user selected for the assignment"
+                            },
                             "reason": {
                                 "type": "string",
                                 "description": "A short explanation of why the user is the best fit for the task"
@@ -383,6 +387,7 @@ def generate_gpt_task_assignment(unassigned_work_items, all_tasks):
                         },
                         "required": [
                             "email",
+                            "display_name",
                             "reason"
                         ],
                         "additionalProperties": False
@@ -396,7 +401,5 @@ def generate_gpt_task_assignment(unassigned_work_items, all_tasks):
         },
         "strict": True
     }
-
-    print(f"Generated schema for GPT: {schema}")
     
     return send_chat(prompt, context="Task assignment logic", model="gpt-4o-mini", schema=schema)
