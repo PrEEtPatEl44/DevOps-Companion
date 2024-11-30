@@ -4,11 +4,12 @@ from app.status_report import fetch_pending_tasks
 from flask_cors import CORS
 from app.stats import count_work_items_by_state, count_work_items_by_assignment, count_work_items_by_type
 from app.project_plan import fetch_all_work_items,generate_ms_project_plan
-from app.config import jwt_token
+from app.config import jwt_token, PROJECT_NAME
 from app.risk import filter_risk_items
 from helper.outlook import OutlookEmailSender
 from app.status_report import organize_tasks_by_due_date
 from helper.chatgpt import generate_gpt_email,generate_subject_line
+from app.login import fetch_user_projects
 app = Flask(__name__)
 CORS(app)
 
@@ -248,6 +249,29 @@ def generate_status_report_plan_route():
     else:
         return jsonify({'error': 'Failed to generate status report plan'}), 500
 
+@app.route('/api/get_projects', methods=['GET'])
+def get_projects_route():
+    """
+    Flask route to fetch and return all projects as JSON.
+    """
+    projects = fetch_user_projects(jwt_token)
+    if projects:
+        return jsonify(projects)
+    else:
+        return jsonify({'error': 'Failed to fetch projects from Azure DevOps'}), 500
+
+@app.route('/api/switch_project', methods=['POST'])
+def switch_project():
+    """
+    Flask route to switch the current project.
+    """
+    data = request.get_json()
+    PROJECT_NAME = data.get('project')
+    if not project_id:
+        return jsonify({'error': 'Missing project_id parameter'}), 400
+
+    # Perform the project switch operation here
+    return jsonify({'message': f'Switched to project with ID: {project_id}'}), 200
 
 if __name__ == '__main__':
     app.run(debug=True)
