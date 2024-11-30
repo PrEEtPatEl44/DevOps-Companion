@@ -2,12 +2,18 @@ import requests
 import json
 import base64
 import datetime
+import urllib.parse
 class OutlookEmailSender:
     def __init__(self, access_token):
         self.access_token = access_token
         self.graph_url = 'https://graph.microsoft.com/v1.0'
 
     def send_email(self, subject, body, to_recipients, attachments=None):
+        encoded_subject = urllib.parse.quote(subject)
+        encoded_body = urllib.parse.quote(body)
+        #encoded_to_recipients = urllib.parse.quote(to_recipients)#work around does not support multiple recipients
+        encoded_to_recipients = urllib.parse.quote(','.join(to_recipients))
+
         email_msg = {
             'Message': {
                 'Subject': subject,
@@ -23,8 +29,9 @@ class OutlookEmailSender:
 
         if attachments:
             for attachment in attachments:
+                print(attachment)
                 with open(attachment, 'rb') as file:
-                    content_bytes = file.read()
+                    content_bytes = file.read()                    
                     content_base64 = base64.b64encode(content_bytes).decode()
                     email_msg['Message']['Attachments'].append({
                         '@odata.type': '#microsoft.graph.fileAttachment',
@@ -33,7 +40,10 @@ class OutlookEmailSender:
                     })
 
         # Instead of sending the email, return a redirect link
-        redirect_link = f"https://outlook.office.com/mail/deeplink/compose?subject={subject}&body={body}&to={','.join(to_recipients)}"
+        redirect_link = (
+        f"https://outlook.office.com/mail/deeplink/compose?"
+        f"subject={encoded_subject}&body={encoded_body}&to={encoded_to_recipients}"
+    )
         print(f'Redirect link: {redirect_link}')
         return redirect_link
 
