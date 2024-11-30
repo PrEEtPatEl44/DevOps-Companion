@@ -68,8 +68,8 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
         if (!selectedUser) {
             toast.error("Please select a user.");
             return;
-        }
-        console.log(selectedUser);
+        } 
+        
         const { title, id } = data;
         const emailData = {
             to: [selectedUser.values],
@@ -78,7 +78,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
             from_name: session?.user?.name,
             context: context||`Regarding the task: ${title} (ID: ${id})`,
         };
-    
+        console.log(emailData);
         try {
             const response = await fetch("http://127.0.0.1:5000/api/email_sender/generate_email_ai", {
                 method: "POST",
@@ -240,11 +240,11 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
                     />
                 </div>
                 <div className="modal-footer">
-                    <Button onClick={() => SendGeneratedEmail(session, selectedUser.map(user => user.value))}>
-                        Send Emails
-                    </Button>
-                    <Button variant="outline" onClick={() => setResultModalOpen(false)}>
+                    <Button className='mx-3' variant="outline" onClick={() => setResultModalOpen(false)}>
                         Close
+                    </Button>
+                    <Button className='mx-3' onClick={() => SendGeneratedEmail(session, selectedUser.map(user => user.value))}>
+                        Send Email
                     </Button>
                 </div>
             </Modal>
@@ -257,14 +257,13 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
             <div><strong>Sender Email:</strong> {session?.user?.email}</div>
             <div className="mt-4">
                 <label className="font-medium">Select Users:</label>
-               
-            <Select
-                isMulti
-                options={userOptions}
-                value={selectedUser}
-                onChange={(selectedOptions) => setSelectedUser(selectedOptions as { value: string; label: string }[])}
-                placeholder="Select users..."
-            />
+                <Select
+                    isMulti
+                    options={userOptions}
+                    value={selectedUser.length > 0 ? selectedUser : userOptions.filter(option => option.value === data.userEmail)}
+                    onChange={(selectedOptions) => setSelectedUser(selectedOptions as { value: string; label: string }[])}
+                    placeholder="Select users..."
+                />
             </div>
             <label className="font-medium">Select Context:</label>
             <Textarea
@@ -285,7 +284,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
             onClick={handleSendEmailAboutTask}
             disabled={!selectedUser}
         >
-            Send Email
+            Generate Email
         </Button>
     </div>
 </Modal>

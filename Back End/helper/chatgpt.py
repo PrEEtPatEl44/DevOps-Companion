@@ -9,7 +9,7 @@ with open('apikeys.txt', 'r') as file:
     api_key = file.read().strip()
 
 client = OpenAI(
-    api_key=api_key
+    api_key='REMOVED_OPENAI_KEY'
 )
 
 # Function to send a chat with given prompt and context
@@ -63,7 +63,7 @@ def generate_gpt_email(to, to_name, from_, from_name, context):
     :param context: Context or key details for the email content.
     :return: Generated email as a string.
     """
-    prompt = f"Generate a professional email to {to_name} from {from_name}. Context: {context}. DO NOT INCLUDE ANYTHING BUT EMAIL BODY. DO NOT INCLUDE THE SUBJECT INSIDE THIS EMAIL BODY."
+    prompt = f"Generate a professional email to {to} from {from_name}.The receivers name is {to_name} Context: {context}. DO NOT INCLUDE ANYTHING BUT EMAIL BODY. DO NOT INCLUDE THE SUBJECT INSIDE THIS EMAIL BODY. DO NOT USE THE FORMAT 'Dear [Name],'."
     return send_chat(prompt, None)
 
 # Function to generate a subject line from a body
