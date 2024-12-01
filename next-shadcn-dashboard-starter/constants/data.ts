@@ -115,6 +115,7 @@ export type Risk = {
   severity: string,
   dueDate: string,
   priorityScore: number,
+  userEmail:string,
 };
 export type Employee = {
   id: number;
