@@ -118,6 +118,7 @@ export default function OverViewPage() {
         });
 
         const { draftLink } = await createEmailResponse.json();
+        console.log('Email response:', draftLink);
         if (draftLink) {
           window.location.href = draftLink; // Redirect to draft email link
         }

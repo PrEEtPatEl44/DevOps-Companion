@@ -22,7 +22,7 @@ def count_work_items_by_state():
         ORDER BY [System.ChangedDate] DESC
         """
     }
-
+    print(PROJECT_NAME)
     try:
         response = requests.post(url, auth=auth, json=query)
         if response.status_code != 200:
@@ -75,6 +75,7 @@ def count_work_items_by_assignment():
         ORDER BY [System.ChangedDate] DESC
         """
     }
+    print(PROJECT_NAME)
     try:
         response = requests.post(url, auth=auth, json=query)
         if response.status_code != 200:

@@ -4,16 +4,18 @@ from app.status_report import fetch_pending_tasks
 from flask_cors import CORS
 from app.stats import count_work_items_by_state, count_work_items_by_assignment, count_work_items_by_type
 from app.project_plan import fetch_all_work_items,generate_ms_project_plan
-from app.config import jwt_token, PROJECT_NAME
+from app.config import jwt_token, PROJECT_NAME, set_jwt_token, set_project_name 
 from app.risk import filter_risk_items
 from helper.outlook import OutlookEmailSender
 from app.status_report import organize_tasks_by_due_date
 from helper.chatgpt import generate_gpt_email,generate_subject_line
 from app.login import get_current_project, fetch_user_projects
-from dotenv import load_dotenv
 import os
+from chatbot.chat_handler import ChatHandler
 app = Flask(__name__)
 CORS(app)
+chat_handler = ChatHandler()
+
 def update_project_name(new_project_name):
     # Open the .env file to read lines
     with open('.env', 'r') as file:
@@ -134,7 +136,7 @@ def receive_token():
 
     data = request.get_json()
     jwt_token = data.get('access_token')
-    
+    set_jwt_token(jwt_token)
     if jwt_token:
         print(f"Received token: {jwt_token}")
         return jsonify({"message": "Token received successfully", "status": "success"}), 200
@@ -208,7 +210,6 @@ def create_draft():
     subject = data.get('subject')
     body = data.get('body')
     to_recipients = data.get('to_recipients')
-    access_token = data.get('access_token')
     attachments = data.get('attachments', None)
 
     if not subject or not body or not to_recipients:
@@ -216,16 +217,12 @@ def create_draft():
 
     # Assuming you fetch an access token for authentication
     #access_token = jwt_token  # You need to implement this function to fetch a valid token
-
-    if not access_token:
-        return jsonify({'error': 'Authentication failed. No access token provided.'}), 401
-
     try:
         # Instantiate the email sender
-        email_sender = OutlookEmailSender(access_token)
+        email_sender = OutlookEmailSender(jwt_token)
 
         # Use the OutlookEmailSender's send_email method to create a draft
-        draft_link = email_sender.send_email(subject, body, to_recipients, attachments)
+        draft_link = email_sender.send_mail(subject, body, to_recipients, attachments)
 
         return jsonify({
             'message': 'Draft created successfully',
@@ -314,18 +311,60 @@ def switch_project():
     """
     data = request.get_json()
     new_project_name = data.get('project')
-
+    print(new_project_name)
     if new_project_name:
         # Update the .env file with the new project name
-        update_project_name(new_project_name)
-        # Load the updated environment variable
-        load_dotenv()
+        set_project_name(new_project_name)
+        print(f"Switched to project: {PROJECT_NAME}")
 
         # Access the updated PROJECT_NAME
         updated_project_name = os.getenv('PROJECT_NAME')
         return jsonify({'message': f'Switched to project: {updated_project_name}'}), 200
     else:
         return jsonify({'error': 'Invalid project name provided'}), 400
+
+
+@app.route('/api/chatbot/send_message', methods=['POST'])
+def send_message_to_chatbot():
+    """
+    Route to send a message to the chatbot and receive its response.
+    """
+    data = request.get_json()
+    user_message = data.get('message')
+
+    if not user_message:
+        return jsonify({'error': 'Message content is required'}), 400
+
+    try:
+        response = chat_handler.handle_message(user_message)
+        return jsonify(response)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/chatbot/chat_history', methods=['GET'])
+def get_chat_history():
+    """
+    Route to retrieve the chat history.
+    """
+    try:
+        chat_history = chat_handler.get_chat_history()
+        return jsonify({'chat_history': chat_history})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/chatbot/reset_chat', methods=['POST'])
+def reset_chat_history():
+    """
+    Route to reset the chat history.
+    """
+    try:
+        chat_handler.chat_data.reset()
+        return jsonify({'message': 'Chat history reset successfully'})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 
 if __name__ == '__main__':
     app.run(debug=True)

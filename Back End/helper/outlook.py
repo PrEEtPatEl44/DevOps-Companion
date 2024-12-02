@@ -2,6 +2,7 @@ import requests
 import json
 import base64
 import datetime
+import os
 import urllib.parse
 class OutlookEmailSender:
     def __init__(self, access_token):
@@ -28,11 +29,16 @@ class OutlookEmailSender:
             "toRecipients": [{"emailAddress": {"address": recipient}} for recipient in to_recipients],
             "attachments": []
         }
-
+        print("Current directory:", os.getcwd())
+        if attachments and not os.path.isabs(attachments[0]):
+            attachments[0] = os.path.join(os.getcwd(), attachments[0])
+            print(f"Attachment path updated to: {attachments[0]}")
         # Add attachments if provided
         if attachments:
+            print("Attachments provided:")
             for attachment in attachments:
                 with open(attachment, "rb") as file:
+                    print(f"Attaching file: {attachment}")
                     content_bytes = file.read()
                     content_base64 = base64.b64encode(content_bytes).decode()
                     email_msg["attachments"].append({
@@ -41,22 +47,26 @@ class OutlookEmailSender:
                         "contentBytes": content_base64
                     })
 
-        # Make the POST request to create a draft
-        response = requests.post(url, headers=headers, json=email_msg)
+        try:
+            # Make the POST request to create a draft
+            response = requests.post(url, headers=headers, json=email_msg)
 
-        if response.status_code == 201:  # Created
-            draft = response.json()
-            draft_id = draft.get('id')
-            if draft_id:
-                redirect_link = f"https://outlook.office.com/mail/deeplink/compose/id/{draft_id}"
-                print("Draft email created successfully!")
-                print(f"Redirect link to draft: {redirect_link}")
-                return redirect_link
+            if response.status_code == 201:  # Created
+                draft = response.json()
+                draft_id = draft.get('id')
+                if draft_id:
+                    redirect_link = f"https://outlook.office.com/mail/deeplink/compose/id/{draft_id}"
+                    print("Draft email created successfully!")
+                    print(f"Redirect link to draft: {redirect_link}")
+                    return redirect_link
+                else:
+                    print("Draft created but no ID returned.")
+                    return None
             else:
-                print("Draft created but no ID returned.")
+                print(f"Error creating draft: {response.status_code} - {response.text}")
                 return None
-        else:
-            print(f"Error creating draft: {response.status_code} - {response.text}")
+        except requests.exceptions.RequestException as e:
+            print(f"An error occurred: {e}")
             return None
 
 
