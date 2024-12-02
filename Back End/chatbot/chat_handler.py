@@ -16,12 +16,11 @@ from chatbot.chat_data_struc import ChatData
 class ChatHandler:
     def __init__(self):
         self.chat_data = ChatData()
-        ChatData.add_system_message(
-            self,
-            "You are an intelligent assistant designed to support a project manager who utilizes Azure DevOps and Outlook. "
-            "You have access to tools that allow you to send emails, retrieve emails, schedule meetings, fetch work items, "
-            "retrieve risk items, list users, and calculate priority scores. Use these capabilities to provide comprehensive assistance "
-            "and streamline the project management process."
+        self.chat_data.add_system_message(
+            content="You are an intelligent assistant designed to support a project manager who utilizes Azure DevOps and Outlook. "
+                    "You have access to tools that allow you to send emails, retrieve emails, schedule meetings, fetch work items, "
+                    "retrieve risk items, list users, and calculate priority scores. Use these capabilities to provide comprehensive assistance "
+                    "and streamline the project management process."
         )
 
         # Define tools as required by the new format
@@ -154,7 +153,7 @@ class ChatHandler:
             "get_priority_scores": get_total_priority_by_user_devops,
         }
 
-    def handle_message(self, user_message, model="gpt-4-0613"):
+    def handle_message(self, user_message, model="gpt-4o-2024-08-06"):
         """Handle user input, call tools if needed, and return a response."""
         self.chat_data.add_user_message(user_message)
 
@@ -209,7 +208,7 @@ class ChatHandler:
 
         # Send the updated conversation history back to the model for continuation
         messages = self.chat_data.get_messages()
-        response = send_chat_with_functions(messages, model="gpt-4-0613", functions=self.tools)
+        response = send_chat_with_functions(messages, model="gpt-4o-2024-08-06", functions=self.tools)
         return {"messages": response["messages"]}
 
     def _execute_tool_call(self, tool_call):
