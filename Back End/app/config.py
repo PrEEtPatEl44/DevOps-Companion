@@ -1,6 +1,6 @@
-# Azure DevOps Configuration
+ # Azure DevOps Configuration
 ORG_NAME = 'preet442727'  # Replace with your Azure DevOps organization name
-PROJECT_NAME = 'TestProjectKenn'  # Replace with your Azure DevOps project name
+PROJECT_NAME = "TestProjectKenn"  # Replace with your Azure DevOps project name
 PAT = 'VJ2qQQgHniwwpMroZeGtayYSqnmVympa62s7oBOtc9DW0rJCjKo0JQQJ99AKACAAAAAAAAAAAAASAZDOE742'  # Replace with your Azure DevOps Personal Access Token
 
 # Base URLs

@@ -9,10 +9,26 @@ from app.risk import filter_risk_items
 from helper.outlook import OutlookEmailSender
 from app.status_report import organize_tasks_by_due_date
 from helper.chatgpt import generate_gpt_email,generate_subject_line
-from app.login import fetch_user_projects
+from app.login import get_current_project, fetch_user_projects
+from dotenv import load_dotenv
+import os
 app = Flask(__name__)
 CORS(app)
+def update_project_name(new_project_name):
+    # Open the .env file to read lines
+    with open('.env', 'r') as file:
+        lines = file.readlines()
 
+    # Update the PROJECT_NAME line
+    with open('.env', 'w') as file:
+        for line in lines:
+            if line.startswith('PROJECT_NAME='):
+                file.write(f'PROJECT_NAME={new_project_name}\n')
+            else:
+                file.write(line)
+
+    # Update the environment variable in the current session
+    os.environ['PROJECT_NAME'] = new_project_name
 @app.route('/api/automated_task_assignment/fetch_allusers', methods=['GET'])
 def fetch_users():
     """
@@ -257,24 +273,59 @@ def get_projects_route():
     """
     Flask route to fetch and return all projects as JSON.
     """
-    projects = fetch_user_projects(jwt_token)
+    projects = fetch_user_projects()
     if projects:
         return jsonify(projects)
     else:
         return jsonify({'error': 'Failed to fetch projects from Azure DevOps'}), 500
 
+@app.route('/api/get_current_project', methods=['GET'])
+def fetch_current_projects():
+    """
+    Flask route to fetch and return all projects as JSON.
+    """
+    projects = get_current_project()
+    if projects:
+        return jsonify(projects)
+    else:
+        return jsonify({'error': 'Failed to fetch current project from Azure DevOps'}), 500
+
+# @app.route('/api/switch_project', methods=['POST'])
+# def switch_project():
+#     """
+#     Flask route to switch the current project.
+#     """
+    
+#     data = request.get_json()
+#     new_project_name = data.get('project')
+
+#     if new_project_name:
+#         # Update the global variable
+#         os.environ['PROJECT_NAME'] = new_project_name
+#         #PROJECT_NAME = new_project_name
+#         print(f"Switched to project: {PROJECT_NAME}")
+#         return jsonify({'message': f'Switched to project: {PROJECT_NAME}'}), 200
+#     else:
+#         return jsonify({'error': 'Invalid project name provided'}), 400
 @app.route('/api/switch_project', methods=['POST'])
 def switch_project():
     """
     Flask route to switch the current project.
     """
     data = request.get_json()
-    PROJECT_NAME = data.get('project')
-    if not project_id:
-        return jsonify({'error': 'Missing project_id parameter'}), 400
+    new_project_name = data.get('project')
 
-    # Perform the project switch operation here
-    return jsonify({'message': f'Switched to project with ID: {project_id}'}), 200
+    if new_project_name:
+        # Update the .env file with the new project name
+        update_project_name(new_project_name)
+        # Load the updated environment variable
+        load_dotenv()
+
+        # Access the updated PROJECT_NAME
+        updated_project_name = os.getenv('PROJECT_NAME')
+        return jsonify({'message': f'Switched to project: {updated_project_name}'}), 200
+    else:
+        return jsonify({'error': 'Invalid project name provided'}), 400
 
 if __name__ == '__main__':
     app.run(debug=True)
