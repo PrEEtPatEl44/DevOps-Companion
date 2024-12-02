@@ -1,11 +1,48 @@
- # Azure DevOps Configuration
-ORG_NAME = 'preet442727'  # Replace with your Azure DevOps organization name
-PROJECT_NAME = "TestProjectKenn"  # Replace with your Azure DevOps project name
-PAT = 'VJ2qQQgHniwwpMroZeGtayYSqnmVympa62s7oBOtc9DW0rJCjKo0JQQJ99AKACAAAAAAAAAAAAASAZDOE742'  # Replace with your Azure DevOps Personal Access Token
+# Azure DevOps Configuration
+ORG_NAME = 'preet442727'  # Default Azure DevOps organization name
+PROJECT_NAME = "TestProjectKenn"  # Default Azure DevOps project name
+PAT = 'VJ2qQQgHniwwpMroZeGtayYSqnmVympa62s7oBOtc9DW0rJCjKo0JQQJ99AKACAAAAAAAAAAAAASAZDOE742'  # Default Azure DevOps Personal Access Token
+jwt_token = 'eyJ0eXAiOiJKV1QiLCJub25jZSI6Ii1nVDQzQVJTcG5kYl80b0VGZ3poSXE4eElUM2Z6cVFmbkxua1RxWFFNUzgiLCJhbGciOiJSUzI1NiIsIng1dCI6Inp4ZWcyV09OcFRrd041R21lWWN1VGR0QzZKMCIsImtpZCI6Inp4ZWcyV09OcFRrd041R21lWWN1VGR0QzZKMCJ9...'
 
 # Base URLs
 AZURE_DEVOPS_GRAPH_API_URL = f"https://vssps.dev.azure.com/{ORG_NAME}/_apis/graph"
 AZURE_DEVOPS_REST_API_URL = f"https://dev.azure.com/{ORG_NAME}/{PROJECT_NAME}/_apis"
 
-# jwt
-jwt_token = 'eyJ0eXAiOiJKV1QiLCJub25jZSI6IjJZOC13dnNvOUgyN3hNZzZxN1dON1o3cU42dV9pV3k3czZUc1BpX1daUE0iLCJhbGciOiJSUzI1NiIsIng1dCI6Inp4ZWcyV09OcFRrd041R21lWWN1VGR0QzZKMCIsImtpZCI6Inp4ZWcyV09OcFRrd041R21lWWN1VGR0QzZKMCJ9.eyJhdWQiOiIwMDAwMDAwMy0wMDAwLTAwMDAtYzAwMC0wMDAwMDAwMDAwMDAiLCJpc3MiOiJodHRwczovL3N0cy53aW5kb3dzLm5ldC84MmQyNjlkMy1iODc4LTQ4MTMtYmMyYy0yYzM5NTFhYmEzNjgvIiwiaWF0IjoxNzMyODA2NjA5LCJuYmYiOjE3MzI4MDY2MDksImV4cCI6MTczMjgxMDU5MiwiYWNjdCI6MCwiYWNyIjoiMSIsImFpbyI6IkFZUUFlLzhZQUFBQVZzbGFBQXlaR2Q3ZnN1a0dpaHRSa3A1by81eGhVcU4wbFFuVWNxN0pDeXRQVko3SjVKWmxKZGpza2RlaVplaDRudWtibG5vbUlJS2hFclJoZXRqVmVqL0NkODRMTE9UWlplK1JKVG5pYjdaVHdtelFUazJIZEJMWXFuSGNoTEtONUZENmdlSWNQK0hzRklpTERVZXZaNFArOFZ2RVd0WS85T3ZOQzExWmxoTT0iLCJhbHRzZWNpZCI6IjE6bGl2ZS5jb206MDAwM0JGRkU4NzQ4ODc1MCIsImFtciI6WyJwd2QiLCJtZmEiXSwiYXBwX2Rpc3BsYXluYW1lIjoiSVRDYXNlQ29tcCIsImFwcGlkIjoiZmI3MDFhMGQtOTgxMS00NmM1LThmOTItNTNhNzk0MzljMzlmIiwiYXBwaWRhY3IiOiIxIiwiZW1haWwiOiJwcmVldDQ0MjcyN0BvdXRsb29rLmNvbSIsImZhbWlseV9uYW1lIjoiUGF0ZWwiLCJnaXZlbl9uYW1lIjoiUHJlZXQiLCJpZHAiOiJsaXZlLmNvbSIsImlkdHlwIjoidXNlciIsImlwYWRkciI6IjIwNy4zNS4xNC4xNjQiLCJuYW1lIjoiUHJlZXQgUGF0ZWwiLCJvaWQiOiI0ZDBlOWIzYi0yZmE3LTQ2NTUtYmI4ZC1mZDYwNWYzNGQ3MDMiLCJwbGF0ZiI6IjMiLCJwdWlkIjoiMTAwMzIwMDNEQUVCMkEwQyIsInJoIjoiMS5BVzhCMDJuU2duaTRFMGk4TEN3NVVhdWphQU1BQUFBQUFBQUF3QUFBQUFBQUFBQnZBYmR2QVEuIiwic2NwIjoiZW1haWwgb3BlbmlkIHByb2ZpbGUiLCJzaWduaW5fc3RhdGUiOlsia21zaSJdLCJzdWIiOiJ4WHY3bmRrSU9QV1pkQm5lcFpSbFkyODlVaG41dlQ1bjJMMGdrcnNJN0trIiwidGVuYW50X3JlZ2lvbl9zY29wZSI6Ik5BIiwidGlkIjoiODJkMjY5ZDMtYjg3OC00ODEzLWJjMmMtMmMzOTUxYWJhMzY4IiwidW5pcXVlX25hbWUiOiJsaXZlLmNvbSNwcmVldDQ0MjcyN0BvdXRsb29rLmNvbSIsInV0aSI6Ik1zZHprQmlmREVHSUFIcWhBckhGQUEiLCJ2ZXIiOiIxLjAiLCJ3aWRzIjpbIjYyZTkwMzk0LTY5ZjUtNDIzNy05MTkwLTAxMjE3NzE0NWUxMCIsImI3OWZiZjRkLTNlZjktNDY4OS04MTQzLTc2YjE5NGU4NTUwOSJdLCJ4bXNfaWRyZWwiOiIxIDIyIiwieG1zX3N0Ijp7InN1YiI6Im80QjM5al9fcWN0R1ZaREI2R05WQXlSSEJ0aWI4LUdKTzhRblFZQlJveVkifSwieG1zX3RjZHQiOjE3Mjc5MTg5MTB9.k-LshHpcHM-QYoYtOuidV34UkEsCTedGAFMUuz-yAkUJwog9rHxMlSryPgxdge8MEj37QU_C6WLh1HiG2exTIlqrH45cccIP9K7FMJQI2JFnrvSIKt5fr57IY7vrvd8PSnLvZHlv0Ndym3B5jCk3ZSadPKSbzmekd8tvSkj4vvMGCb3ljbdUgXunBgrop-x23G9lfk4r2XvJkyByDo1DtnZvigsMJXY5sCDZ4XH6Mku2rs6Gr9zuOoebyuLxZTiPKcs6C51KGgt3ot4KwXSbZT7RPy8QqgaYHDByQ1lZ2dB2wBumVUWK5tdWN9bLCHOsvzQLUN31pzmtPRK3YOzkhA'
+# Getters
+def get_org_name():
+    return ORG_NAME
+
+def get_project_name():
+    return PROJECT_NAME
+
+def get_pat():
+    return PAT
+
+def get_jwt_token():
+    return jwt_token
+
+def get_azure_devops_graph_api_url():
+    return AZURE_DEVOPS_GRAPH_API_URL
+
+def get_azure_devops_rest_api_url():
+    return AZURE_DEVOPS_REST_API_URL
+
+# Setters
+def set_org_name(value):
+    global ORG_NAME, AZURE_DEVOPS_GRAPH_API_URL, AZURE_DEVOPS_REST_API_URL
+    ORG_NAME = value
+    AZURE_DEVOPS_GRAPH_API_URL = f"https://vssps.dev.azure.com/{ORG_NAME}/_apis/graph"
+    AZURE_DEVOPS_REST_API_URL = f"https://dev.azure.com/{ORG_NAME}/{PROJECT_NAME}/_apis"
+
+def set_project_name(value):
+    global PROJECT_NAME, AZURE_DEVOPS_REST_API_URL
+    PROJECT_NAME = value
+    AZURE_DEVOPS_REST_API_URL = f"https://dev.azure.com/{ORG_NAME}/{PROJECT_NAME}/_apis"
+
+def set_pat(value):
+    global PAT
+    PAT = value
+
+def set_jwt_token(value):
+    global jwt_token
+    jwt_token = value
