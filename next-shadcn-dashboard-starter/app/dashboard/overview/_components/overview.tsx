@@ -25,6 +25,36 @@ export default function OverViewPage() {
   const [isModalOpen, setIsModalOpen] = useState(false); // Track modal state
   const [loading, setLoading] = useState(false);
   const { data: session } = useSession(); // Getting the session token
+  const [projects, setProjects] = useState<any[]>([]); // Store projects data
+        const [selectedProject, setSelectedProject] = useState<any | null>(null); // Store selected project
+        const fetchCurrentProject = async () => {
+          try {
+            const response = await fetch('http://127.0.0.1:5000/api/get_current_project');
+            const data = await response.json();
+            setSelectedProject(data.name);
+            if(response.ok) {
+              console.log('Current project:', data);
+            }
+          } catch (error) {
+            console.error('Error fetching current project:', error);
+          }
+        };
+
+        useEffect(() => {
+          fetchCurrentProject();
+        }, []);
+        useEffect(() => {
+          const fetchProjects = async () => {
+            try {
+              const response = await fetch('http://127.0.0.1:5000/api/get_projects');
+              const data = await response.json();
+              setProjects(data);
+            } catch (error) {
+              console.error('Error fetching projects:', error);
+            }
+          };
+          fetchProjects();
+        }, []);
   useEffect(() => {
     const fetchEmails = async () => {
       try {
@@ -36,6 +66,8 @@ export default function OverViewPage() {
           displayName: data[key].displayName,
           taskCount: data[key].taskCount,
         }));
+
+        
         
         setEmailData(emailArray);
       } catch (error) {
@@ -129,18 +161,71 @@ export default function OverViewPage() {
       <div className="space-y-2">
         <div className="flex items-center justify-between space-y-2">
           <h2 className="text-2xl font-bold tracking-tight text-black">
-            Hi, Welcome back 👋
+            Hi, Welcome back 👋  
+            <p className='text-base'>{selectedProject ? `Current Project: ${selectedProject}` : 'No project selected'}</p>
           </h2>
-          <div className="hidden items-center space-x-2 md:flex">
-            {/* <CalendarDateRangePicker /> */}
+          
+         
+        
+
+
+          <div className="flex items-center space-x-2">
+            <Select
+              options={projects.map((project) => ({
+                label: project.name,
+                value: project.id,
+              }))}
+              value={selectedProject}
+              onChange={(selectedOption)=>{
+                setSelectedProject(selectedOption);
+                fetch('http://127.0.0.1:5000/api/switch_project', {
+                    method: 'POST',
+                    mode: 'cors',
+                    headers: {
+                    'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ project: selectedOption.label }),
+                  })
+                    .then((response) => response.json())
+                    .then((data) => {
+                    console.log('Project switched:', data);
+                    fetchCurrentProject(); 
+                    })
+                    .catch((error) => {
+                    console.error('Error switching project:', error);
+                    });
+                fetchCurrentProject();
+              }}
+                // onChange={(selectedOption) => {
+                // setSelectedProject(selectedOption);
+                // fetch('http://127.0.0.1:5000/api/switch_project', {
+                //   method: 'POST',
+                //   mode: 'cors',
+                //   headers: {
+                //   'Content-Type': 'application/json',
+                //   },
+                //   body: JSON.stringify({ project: selectedOption.label }),
+                // })
+                //   .then((response) => response.json())
+                //   .then((data) => {
+                //   console.log('Project switched:', data);
+                //   fetchCurrentProject(); 
+                //   })
+                //   .catch((error) => {
+                //   console.error('Error switching project:', error);
+                //   });
+                // }}
+              placeholder="Select a project"
+              className='text-black'
+            />
             <Button onClick={() => setIsModalOpen(true)}>Generate Daily Report</Button>
-          </div>
-          {/* Display Modal when it's open */}
-        {isModalOpen && (
+            {isModalOpen && (
           <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title='Generate Report' >
             {modalContent}
           </Modal>
         )}
+          </div>
+        
         </div>
         <Tabs defaultValue="overview" className="space-y-4">
           <TabsList>
