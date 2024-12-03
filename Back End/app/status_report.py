@@ -1,6 +1,6 @@
 import requests
 from requests.auth import HTTPBasicAuth
-from app.config import AZURE_DEVOPS_REST_API_URL, PAT
+from app.config import get_azure_devops_rest_api_url, PAT
 import logging
 import pandas as pd
 from datetime import datetime, timedelta
@@ -15,7 +15,7 @@ def fetch_pending_tasks(due_date):
     Returns:
         dict or None: A dictionary of work items or None in case of failure.
     """
-    url = f'{AZURE_DEVOPS_REST_API_URL}/wit/wiql?api-version=7.1-preview.2'
+    url = f'https://dev.azure.com/{get_org_name()}/{get_project_name()}/_apis/wit/wiql?api-version=7.1-preview.2'
     auth = HTTPBasicAuth('', PAT)  # Empty username, PAT as the password
     due_date = datetime.today().strftime('%Y-%m-%d')
 
@@ -48,7 +48,7 @@ def fetch_pending_tasks(due_date):
             all_work_items = []
             for i in range(0, len(work_item_ids), 200):
                 batch_ids = work_item_ids[i:i+200]
-                details_url = f"{AZURE_DEVOPS_REST_API_URL}/wit/workitemsbatch?api-version=7.1-preview.1"
+                details_url = f"https://dev.azure.com/{get_org_name()}/{get_project_name()}/_apis/wit/workitemsbatch?api-version=7.1-preview.1"
                 details_payload = {"ids": batch_ids}
                 details_response = requests.post(details_url, auth=auth, json=details_payload)
                 logging.debug(f'Details URL: {details_url}')
@@ -89,7 +89,7 @@ def fetch_all_pending_tasks(due_date):
     Returns:
         list or None: A list of work items or None in case of failure.
     """
-    url = f'{AZURE_DEVOPS_REST_API_URL}/wit/wiql?api-version=7.1-preview.2'
+    url = f'https://dev.azure.com/{get_org_name()}/{get_project_name()}/_apis/wit/wiql?api-version=7.1-preview.2'
     auth = HTTPBasicAuth('', PAT)  # Empty username, PAT as the password
 
     # Define the WIQL query
@@ -121,7 +121,7 @@ def fetch_all_pending_tasks(due_date):
             all_work_items = []
             for i in range(0, len(work_item_ids), 200):
                 batch_ids = work_item_ids[i:i+200]
-                details_url = f"{AZURE_DEVOPS_REST_API_URL}/wit/workitemsbatch?api-version=7.1-preview.1"
+                details_url = f"https://dev.azure.com/{get_org_name()}/{get_project_name()}/_apis/wit/workitemsbatch?api-version=7.1-preview.1"
                 details_payload = {"ids": batch_ids}
                 details_response = requests.post(details_url, auth=auth, json=details_payload)
                 logging.debug(f'Details URL: {details_url}')

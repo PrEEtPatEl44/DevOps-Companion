@@ -5,8 +5,7 @@ PAT = 'VJ2qQQgHniwwpMroZeGtayYSqnmVympa62s7oBOtc9DW0rJCjKo0JQQJ99AKACAAAAAAAAAAA
 jwt_token = 'eyJ0eXAiOiJKV1QiLCJub25jZSI6Ii1nVDQzQVJTcG5kYl80b0VGZ3poSXE4eElUM2Z6cVFmbkxua1RxWFFNUzgiLCJhbGciOiJSUzI1NiIsIng1dCI6Inp4ZWcyV09OcFRrd041R21lWWN1VGR0QzZKMCIsImtpZCI6Inp4ZWcyV09OcFRrd041R21lWWN1VGR0QzZKMCJ9...'
 
 # Base URLs
-AZURE_DEVOPS_GRAPH_API_URL = f"https://vssps.dev.azure.com/{ORG_NAME}/_apis/graph"
-AZURE_DEVOPS_REST_API_URL = f"https://dev.azure.com/{ORG_NAME}/{PROJECT_NAME}/_apis"
+
 
 # Getters
 def get_org_name():
@@ -38,6 +37,8 @@ def set_project_name(value):
     global PROJECT_NAME, AZURE_DEVOPS_REST_API_URL
     PROJECT_NAME = value
     AZURE_DEVOPS_REST_API_URL = f"https://dev.azure.com/{ORG_NAME}/{PROJECT_NAME}/_apis"
+    print(AZURE_DEVOPS_REST_API_URL)
+    print(PROJECT_NAME, )
 
 def set_pat(value):
     global PAT
@@ -46,3 +47,6 @@ def set_pat(value):
 def set_jwt_token(value):
     global jwt_token
     jwt_token = value
+
+AZURE_DEVOPS_GRAPH_API_URL = f"https://vssps.dev.azure.com/{get_org_name()}/_apis/graph"
+AZURE_DEVOPS_REST_API_URL = f"https://dev.azure.com/{get_org_name()}/{get_project_name()}/_apis"

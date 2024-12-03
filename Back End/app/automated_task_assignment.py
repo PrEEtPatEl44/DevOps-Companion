@@ -2,14 +2,14 @@ import logging
 import requests
 from requests.auth import HTTPBasicAuth
 from helper.chatgpt import send_chat
-from app.config import AZURE_DEVOPS_REST_API_URL, AZURE_DEVOPS_GRAPH_API_URL, PAT, PROJECT_NAME
+from app.config import PAT, get_azure_devops_rest_api_url, get_azure_devops_graph_api_url, get_project_name, get_org_name
 import json
 from datetime import datetime, timezone, timedelta
 def get_all_users():
     """
     Fetch and clean all users from Azure DevOps Graph API.
     """
-    url = f'{AZURE_DEVOPS_GRAPH_API_URL}/users?api-version=7.1-preview.1'
+    url = f'{get_azure_devops_graph_api_url()}/users?api-version=7.1-preview.1'
     auth = HTTPBasicAuth('', PAT)  # Empty username, PAT as the password
     try:
         response = requests.get(url, auth=auth)
@@ -47,7 +47,7 @@ def fetch_unassigned_tasks():
     """
     Fetch unassigned tasks from Azure DevOps using WIQL.
     """
-    url = f'{AZURE_DEVOPS_REST_API_URL}/wit/wiql?api-version=7.1-preview.2'
+    url = f'https://dev.azure.com/{get_org_name()}/{get_project_name()}/_apis/wit/wiql?api-version=7.1-preview.2'
     auth = HTTPBasicAuth('', PAT)  # Empty username, PAT as the password
 
     # Define the WIQL query
@@ -55,7 +55,7 @@ def fetch_unassigned_tasks():
         "query": f"""
         SELECT [System.Id], [System.Title], [System.State], [System.AssignedTo], [System.TeamProject]
         FROM WorkItems
-        WHERE [System.AssignedTo] = '' AND [System.TeamProject] = '{PROJECT_NAME}'
+        WHERE [System.AssignedTo] = '' AND [System.TeamProject] = '{get_project_name()}'
         ORDER BY [System.ChangedDate] DESC
         """
     }
@@ -78,7 +78,7 @@ def fetch_unassigned_tasks():
             all_work_items = []
             for i in range(0, len(work_item_ids), 200):
                 batch_ids = work_item_ids[i:i+200]
-                details_url = f"{AZURE_DEVOPS_REST_API_URL}/wit/workitemsbatch?api-version=7.1-preview.1"
+                details_url = f"https://dev.azure.com/{get_org_name()}/{get_project_name()}/_apis/wit/workitemsbatch?api-version=7.1-preview.1"
                 details_payload = {"ids": batch_ids}
                 details_response = requests.post(details_url, auth=auth, json=details_payload)
                 logging.debug(f'Details URL: {details_url}')
@@ -106,7 +106,7 @@ def get_work_item_count_for_user(user_email):
     """
     Get the count of work items assigned to a specific user from Azure DevOps.
     """
-    url = f'{AZURE_DEVOPS_REST_API_URL}/wit/wiql?api-version=7.1-preview.2'
+    url = f'https://dev.azure.com/{get_org_name()}/{get_project_name()}/_apis/wit/wiql?api-version=7.1-preview.2'
     auth = HTTPBasicAuth('', PAT)  # Empty username, PAT as the password
 
     # Define the WIQL query
@@ -169,7 +169,7 @@ def update_work_item_assigned_to(work_item_id, user_email):
     """
     Update the 'Assigned To' field of a work item in Azure DevOps.
     """
-    url = f'{AZURE_DEVOPS_REST_API_URL}/wit/workitems/{work_item_id}?api-version=7.1-preview.3'
+    url = f'https://dev.azure.com/{get_org_name()}/{get_project_name()}/_apis/wit/workitems/{work_item_id}?api-version=7.1-preview.3'
     auth = HTTPBasicAuth('', PAT)  # Empty username, PAT as the password
     headers = {'Content-Type': 'application/json-patch+json'}
     payload = [
