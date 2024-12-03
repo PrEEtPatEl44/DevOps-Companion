@@ -240,10 +240,10 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
                     />
                 </div>
                 <div className="modal-footer">
-                    <Button onClick={() => SendGeneratedEmail(session, selectedUser.map(user => user.value))}>
+                    <Button className='mx-2' onClick={() => SendGeneratedEmail(session, selectedUser.map(user => user.value))}>
                         Send Emails
                     </Button>
-                    <Button variant="outline" onClick={() => setResultModalOpen(false)}>
+                    <Button className='mx-2' variant="outline" onClick={() => setResultModalOpen(false)}>
                         Close
                     </Button>
                 </div>
@@ -257,14 +257,13 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
             <div><strong>Sender Email:</strong> {session?.user?.email}</div>
             <div className="mt-4">
                 <label className="font-medium">Select Users:</label>
-               
-            <Select
-                isMulti
-                options={userOptions}
-                value={selectedUser}
-                onChange={(selectedOptions) => setSelectedUser(selectedOptions as { value: string; label: string }[])}
-                placeholder="Select users..."
-            />
+                <Select
+                    isMulti
+                    options={userOptions}
+                    value={selectedUser.length === 0 && data.userEmail ? [{ value: data.userEmail, label: `${data.assignedTo} (${data.userEmail})` }] : selectedUser}
+                    onChange={(selectedOptions) => setSelectedUser(selectedOptions as { value: string; label: string }[])}
+                    placeholder="Select users..."
+                />
             </div>
             <label className="font-medium">Select Context:</label>
             <Textarea
@@ -285,7 +284,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
             onClick={handleSendEmailAboutTask}
             disabled={!selectedUser}
         >
-            Send Email
+            Generate Email
         </Button>
     </div>
 </Modal>

@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { TrendingUp } from 'lucide-react';
 import { Area, AreaChart, CartesianGrid, XAxis } from 'recharts';
 
@@ -17,33 +18,63 @@ import {
   ChartTooltip,
   ChartTooltipContent
 } from '@/components/ui/chart';
-const chartData = [
-  { month: 'January', desktop: 186, mobile: 80 },
-  { month: 'February', desktop: 305, mobile: 200 },
-  { month: 'March', desktop: 237, mobile: 120 },
-  { month: 'April', desktop: 73, mobile: 190 },
-  { month: 'May', desktop: 209, mobile: 130 },
-  { month: 'June', desktop: 214, mobile: 140 }
-];
 
 const chartConfig = {
-  desktop: {
-    label: 'Desktop',
+  Epic: {
+    label: 'Epic',
+    color: 'hsl(var(--chart-2))'
+  },
+  Bug: {
+    label: 'Bug',
     color: 'hsl(var(--chart-1))'
   },
-  mobile: {
-    label: 'Mobile',
-    color: 'hsl(var(--chart-2))'
+  Feature: {
+    label: 'Feature',
+    color: 'hsl(var(--chart-3))'
+  },
+  'Product Backlog Item': {
+    label: 'Product Backlog Item',
+    color: 'hsl(var(--chart-4))'
+  },
+  Task: {
+    label: 'Task',
+    color: 'hsl(var(--chart-5))'
   }
 } satisfies ChartConfig;
 
 export function AreaGraph() {
+  const [chartData, setChartData] = useState<{ type: string; count: number }[]>([]);
+
+  useEffect(() => {
+    async function fetchChartData() {
+      try {
+        const response = await fetch('http://127.0.0.1:5000/api/stats/count_work_items_by_type');
+        if (!response.ok) {
+          throw new Error('Failed to fetch data');
+        }
+        const data = await response.json();
+
+        // Transform the API response into the format expected by Recharts
+        const transformedData = Object.entries(data).map(([type, count]) => ({
+          type,
+          count: count as number
+        }));
+
+        setChartData(transformedData);
+      } catch (error) {
+        console.error('Error fetching chart data:', error);
+      }
+    }
+
+    fetchChartData();
+  }, []);
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Area Chart - Stacked</CardTitle>
+        <CardTitle>Area Chart</CardTitle>
         <CardDescription>
-          Showing total visitors for the last 6 months
+          Showing distribution of work items by type
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -52,7 +83,6 @@ export function AreaGraph() {
           className="aspect-auto h-[310px] w-full"
         >
           <AreaChart
-            accessibilityLayer
             data={chartData}
             margin={{
               left: 12,
@@ -61,30 +91,21 @@ export function AreaGraph() {
           >
             <CartesianGrid vertical={false} />
             <XAxis
-              dataKey="month"
+              dataKey="type"
               tickLine={false}
               axisLine={false}
               tickMargin={8}
-              tickFormatter={(value) => value.slice(0, 3)}
             />
             <ChartTooltip
               cursor={false}
               content={<ChartTooltipContent indicator="dot" />}
             />
             <Area
-              dataKey="mobile"
+              dataKey="count"
               type="natural"
-              fill="var(--color-mobile)"
+              fill="var(--color-Bug)"
               fillOpacity={0.4}
-              stroke="var(--color-mobile)"
-              stackId="a"
-            />
-            <Area
-              dataKey="desktop"
-              type="natural"
-              fill="var(--color-desktop)"
-              fillOpacity={0.4}
-              stroke="var(--color-desktop)"
+              stroke="var(--color-Bug)"
               stackId="a"
             />
           </AreaChart>
@@ -97,7 +118,7 @@ export function AreaGraph() {
               Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
             </div>
             <div className="flex items-center gap-2 leading-none text-muted-foreground">
-              January - June 2024
+              Distribution of work items
             </div>
           </div>
         </div>
