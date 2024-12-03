@@ -1,6 +1,6 @@
 import requests
 from requests.auth import HTTPBasicAuth
-from app.config import AZURE_DEVOPS_REST_API_URL, PAT, PROJECT_NAME
+from app.config import PAT, get_project_name, get_azure_devops_rest_api_url
 import logging
 
 
@@ -11,18 +11,18 @@ def count_work_items_by_state():
     Returns:
         Optional[Dict[str, int]]: A dictionary with states as keys and their counts as values, or None on failure.
     """
-    url = f'{AZURE_DEVOPS_REST_API_URL}/wit/wiql?api-version=7.1-preview.2'
+    url = f'{get_azure_devops_rest_api_url()}/wit/wiql?api-version=7.1-preview.2'
     auth = HTTPBasicAuth('', PAT)  # Empty username, PAT as the password
 
     query = {
         "query": f"""
         SELECT [System.Id], [System.State]
         FROM WorkItems
-        WHERE [System.TeamProject] = '{PROJECT_NAME}'
+        WHERE [System.TeamProject] = '{get_project_name()}'
         ORDER BY [System.ChangedDate] DESC
         """
     }
-    print(PROJECT_NAME)
+    print(get_project_name())
     try:
         response = requests.post(url, auth=auth, json=query)
         if response.status_code != 200:
@@ -40,7 +40,7 @@ def count_work_items_by_state():
         state_counts = {}
         for i in range(0, len(work_item_ids), 200):
             batch_ids = work_item_ids[i:i+200]
-            details_url = f"{AZURE_DEVOPS_REST_API_URL}/wit/workitemsbatch?api-version=7.1-preview.1"
+            details_url = f"{get_azure_devops_rest_api_url()}/wit/workitemsbatch?api-version=7.1-preview.1"
             details_payload = {"ids": batch_ids}
 
             details_response = requests.post(details_url, auth=auth, json=details_payload)
@@ -64,18 +64,18 @@ def count_work_items_by_assignment():
     Returns:
         Optional[Dict[str, int]]: A dictionary with assigned,unassigned as keys and their counts as values, or None on failure.
     """
-    url = f'{AZURE_DEVOPS_REST_API_URL}/wit/wiql?api-version=7.1-preview.2'
+    url = f'{get_azure_devops_rest_api_url()}/wit/wiql?api-version=7.1-preview.2'
     auth = HTTPBasicAuth('', PAT)  # Empty username, PAT as the password
 
     query = {
         "query": f"""
         SELECT [System.Id], [System.State]
         FROM WorkItems
-        WHERE [System.TeamProject] = '{PROJECT_NAME}'
+        WHERE [System.TeamProject] = '{get_project_name()}'
         ORDER BY [System.ChangedDate] DESC
         """
     }
-    print(PROJECT_NAME)
+    print(get_project_name())
     try:
         response = requests.post(url, auth=auth, json=query)
         if response.status_code != 200:
@@ -93,7 +93,7 @@ def count_work_items_by_assignment():
         assignment_counts = {'assigned': 0, 'unassigned': 0}
         for i in range(0, len(work_item_ids), 200):
             batch_ids = work_item_ids[i:i+200]
-            details_url = f"{AZURE_DEVOPS_REST_API_URL}/wit/workitemsbatch?api-version=7.1-preview.1"
+            details_url = f"{get_azure_devops_rest_api_url()}/wit/workitemsbatch?api-version=7.1-preview.1"
             details_payload = {"ids": batch_ids}
 
             details_response = requests.post(details_url, auth=auth, json=details_payload)
@@ -120,14 +120,14 @@ def count_work_items_by_type():
     Returns:
         Optional[Dict[str, int]]: A dictionary with states as keys and their counts as values, or None on failure.
     """
-    url = f'{AZURE_DEVOPS_REST_API_URL}/wit/wiql?api-version=7.1-preview.2'
+    url = f'{get_azure_devops_rest_api_url()}/wit/wiql?api-version=7.1-preview.2'
     auth = HTTPBasicAuth('', PAT)  # Empty username, PAT as the password
 
     query = {
         "query": f"""
         SELECT [System.Id], [System.WorkItemType]
         FROM WorkItems
-        WHERE [System.TeamProject] = '{PROJECT_NAME}'
+        WHERE [System.TeamProject] = '{get_project_name()}'
         ORDER BY [System.ChangedDate] DESC
         """
     }
@@ -149,7 +149,7 @@ def count_work_items_by_type():
         state_counts = {}
         for i in range(0, len(work_item_ids), 200):
             batch_ids = work_item_ids[i:i+200]
-            details_url = f"{AZURE_DEVOPS_REST_API_URL}/wit/workitemsbatch?api-version=7.1-preview.1"
+            details_url = f"{get_azure_devops_rest_api_url()}/wit/workitemsbatch?api-version=7.1-preview.1"
             details_payload = {"ids": batch_ids}
 
             details_response = requests.post(details_url, auth=auth, json=details_payload)

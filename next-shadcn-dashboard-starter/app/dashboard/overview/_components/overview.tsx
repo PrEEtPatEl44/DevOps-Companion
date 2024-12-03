@@ -18,6 +18,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useSession } from 'next-auth/react';
 import Select from 'react-select';
 import { Modal } from '@/components/ui/modal';
+import { fetchData } from 'next-auth/client/_utils';
 export default function OverViewPage() {
   const [taskData, setTaskData] = useState<any>(null);
   const [emailData, setEmailData] = useState<any[]>([]); // Store email data
@@ -27,6 +28,30 @@ export default function OverViewPage() {
   const { data: session } = useSession(); // Getting the session token
   const [projects, setProjects] = useState<any[]>([]); // Store projects data
         const [selectedProject, setSelectedProject] = useState<any | null>(null); // Store selected project
+        const fetchEmails = async () => {
+          try {
+            setLoading(true);
+            const response = await fetch('http://127.0.0.1:5000/api/automated_task_assignment/task_counts');
+            const data = await response.json();
+            const emailArray = Object.keys(data).map(key => ({
+              email: key,
+              displayName: data[key].displayName,
+              taskCount: data[key].taskCount,
+            }));
+            setEmailData(emailArray);
+          } catch (error) {
+            console.error('Error fetching email data:', error);
+          } finally {
+            setLoading(false);
+          }
+        };
+        const fetchData = async () => {
+          const response = await fetch(
+            'http://127.0.0.1:5000/api/stats/count_work_items_by_type'
+          );
+          const data = await response.json();
+          setTaskData(data);
+        };
         const fetchCurrentProject = async () => {
           try {
             const response = await fetch('http://127.0.0.1:5000/api/get_current_project');
@@ -42,6 +67,8 @@ export default function OverViewPage() {
 
         useEffect(() => {
           fetchCurrentProject();
+          fetchEmails();
+          fetchData();
         }, []);
         useEffect(() => {
           const fetchProjects = async () => {
@@ -55,43 +82,43 @@ export default function OverViewPage() {
           };
           fetchProjects();
         }, []);
-  useEffect(() => {
-    const fetchEmails = async () => {
-      try {
-        setLoading(true);
-        const response = await fetch('http://127.0.0.1:5000/api/automated_task_assignment/task_counts');
-        const data = await response.json();
-        const emailArray = Object.keys(data).map(key => ({
-          email: key,
-          displayName: data[key].displayName,
-          taskCount: data[key].taskCount,
-        }));
+  // useEffect(() => {
+  //   const fetchEmails = async () => {
+  //     try {
+  //       setLoading(true);
+  //       const response = await fetch('http://127.0.0.1:5000/api/automated_task_assignment/task_counts');
+  //       const data = await response.json();
+  //       const emailArray = Object.keys(data).map(key => ({
+  //         email: key,
+  //         displayName: data[key].displayName,
+  //         taskCount: data[key].taskCount,
+  //       }));
 
         
         
-        setEmailData(emailArray);
-      } catch (error) {
-        console.error('Error fetching email data:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchEmails(); 
-  }, []);
+  //       setEmailData(emailArray);
+  //     } catch (error) {
+  //       console.error('Error fetching email data:', error);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+  //   fetchEmails(); 
+  // }, []);
 
 
-  useEffect(() => {
-    // Fetch data from the API
-    const fetchData = async () => {
-      const response = await fetch(
-        'http://127.0.0.1:5000/api/stats/count_work_items_by_type'
-      );
-      const data = await response.json();
-      setTaskData(data);
-    };
+  // useEffect(() => {
+  //   // Fetch data from the API
+  //   const fetchData = async () => {
+  //     const response = await fetch(
+  //       'http://127.0.0.1:5000/api/stats/count_work_items_by_type'
+  //     );
+  //     const data = await response.json();
+  //     setTaskData(data);
+  //   };
 
-    fetchData();
-  }, []);
+  //   fetchData();
+  // }, []);
 
 
   const generateStatusReport = async (session:any) => {
@@ -170,62 +197,43 @@ export default function OverViewPage() {
         
 
 
-          <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-2">
             <Select
-              options={projects.map((project) => ({
-                label: project.name,
-                value: project.id,
-              }))}
+              options={Array.isArray(projects) ? projects.map((project) => ({
+              label: project.name,
+              value: project.id,
+              })) : []}
               value={selectedProject}
-              onChange={(selectedOption)=>{
-                setSelectedProject(selectedOption);
-                fetch('http://127.0.0.1:5000/api/switch_project', {
-                    method: 'POST',
-                    mode: 'cors',
-                    headers: {
-                    'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ project: selectedOption.label }),
-                  })
-                    .then((response) => response.json())
-                    .then((data) => {
-                    console.log('Project switched:', data);
-                    fetchCurrentProject(); 
-                    })
-                    .catch((error) => {
-                    console.error('Error switching project:', error);
-                    });
+              onChange={(selectedOption) => {
+              setSelectedProject(selectedOption);
+              fetch('http://127.0.0.1:5000/api/switch_project', {
+                method: 'POST',
+                mode: 'cors',
+                headers: {
+                'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ project: selectedOption.label }),
+              })
+                .then((response) => response.json())
+                .then((data) => {
+                console.log('Project switched:', data);
                 fetchCurrentProject();
+                window.location.reload(); // Refresh the page
+                })
+                .catch((error) => {
+                console.error('Error switching project:', error);
+                });
               }}
-                // onChange={(selectedOption) => {
-                // setSelectedProject(selectedOption);
-                // fetch('http://127.0.0.1:5000/api/switch_project', {
-                //   method: 'POST',
-                //   mode: 'cors',
-                //   headers: {
-                //   'Content-Type': 'application/json',
-                //   },
-                //   body: JSON.stringify({ project: selectedOption.label }),
-                // })
-                //   .then((response) => response.json())
-                //   .then((data) => {
-                //   console.log('Project switched:', data);
-                //   fetchCurrentProject(); 
-                //   })
-                //   .catch((error) => {
-                //   console.error('Error switching project:', error);
-                //   });
-                // }}
               placeholder="Select a project"
-              className='text-black'
+              className="text-black"
             />
             <Button onClick={() => setIsModalOpen(true)}>Generate Daily Report</Button>
             {isModalOpen && (
-          <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title='Generate Report' >
-            {modalContent}
-          </Modal>
-        )}
-          </div>
+              <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Generate Report">
+              {modalContent}
+              </Modal>
+            )}
+            </div>
         
         </div>
         <Tabs defaultValue="overview" className="space-y-4">

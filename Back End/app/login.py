@@ -1,5 +1,5 @@
 import requests
-from app.config import AZURE_DEVOPS_REST_API_URL, PAT, PROJECT_NAME, ORG_NAME
+from app.config import AZURE_DEVOPS_REST_API_URL, PAT, ORG_NAME, get_project_name
 import base64
 def fetch_user_projects():
     """
@@ -35,10 +35,11 @@ def fetch_user_projects():
     except Exception as e:
         print(f"An error occurred: {e}")
         return None
+
 def get_current_project():
     API_VERSION = "7.1"  # Azure DevOps REST API version
     # Azure DevOps URL for organization-level projects
-    url = f"https://dev.azure.com/{ORG_NAME}/_apis/projects/{PROJECT_NAME}?api-version={API_VERSION}"
+    url = f"https://dev.azure.com/{ORG_NAME}/_apis/projects/{get_project_name()}?api-version={API_VERSION}"
     auth_header = base64.b64encode(f":{PAT}".encode()).decode()
     # Azure DevOps expects the Authorization header in Basic Auth format
     headers = {

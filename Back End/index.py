@@ -4,7 +4,7 @@ from app.status_report import fetch_pending_tasks
 from flask_cors import CORS
 from app.stats import count_work_items_by_state, count_work_items_by_assignment, count_work_items_by_type
 from app.project_plan import fetch_all_work_items,generate_ms_project_plan
-from app.config import jwt_token, PROJECT_NAME, set_jwt_token, set_project_name 
+from app.config import jwt_token, set_jwt_token, set_project_name, get_project_name 
 from app.risk import filter_risk_items
 from helper.outlook import OutlookEmailSender
 from app.status_report import organize_tasks_by_due_date
@@ -311,15 +311,12 @@ def switch_project():
     """
     data = request.get_json()
     new_project_name = data.get('project')
-    print(new_project_name)
     if new_project_name:
         # Update the .env file with the new project name
         set_project_name(new_project_name)
-        print(f"Switched to project: {PROJECT_NAME}")
-
-        # Access the updated PROJECT_NAME
-        updated_project_name = os.getenv('PROJECT_NAME')
-        return jsonify({'message': f'Switched to project: {updated_project_name}'}), 200
+        #print(f"Switched to project: {new_project_name}")
+        print(f"Switched to project: {get_project_name()}")
+        return jsonify({'message': f'Switched to project: {new_project_name}'}), 200
     else:
         return jsonify({'error': 'Invalid project name provided'}), 400
 
