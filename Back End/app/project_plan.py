@@ -1,7 +1,7 @@
 import requests
 import logging
 from requests.auth import HTTPBasicAuth
-from app.config import AZURE_DEVOPS_REST_API_URL, PAT, PROJECT_NAME
+from app.config import get_azure_devops_rest_api_url, PAT, get_project_name
 import pandas as pd
 from datetime import datetime
 
@@ -17,7 +17,7 @@ def fetch_all_work_items():
     Returns:
         dict: A dictionary with work items, or None if an error occurred.
     """
-    url = f'{AZURE_DEVOPS_REST_API_URL}/wit/wiql?api-version=7.1-preview.2'
+    url = f'{get_azure_devops_rest_api_url()}/wit/wiql?api-version=7.1-preview.2'
     
     auth = HTTPBasicAuth('', PAT)  # Empty username, PAT as the password
 
@@ -26,7 +26,7 @@ def fetch_all_work_items():
         "query": f"""
         SELECT [System.Id], [System.Title], [System.State], [System.AssignedTo], [System.TeamProject], [Microsoft.VSTS.Common.Priority], [Microsoft.VSTS.Common.Severity], [Microsoft.VSTS.Scheduling.DueDate]
         FROM WorkItems
-        WHERE [System.TeamProject] = '{PROJECT_NAME}'
+        WHERE [System.TeamProject] = '{get_project_name()}'
         ORDER BY [System.ChangedDate] DESC
         """
     }
@@ -51,7 +51,7 @@ def fetch_all_work_items():
             all_work_items = []
             for i in range(0, len(work_item_ids), 200):
                 batch_ids = work_item_ids[i:i+200]
-                details_url = f"{AZURE_DEVOPS_REST_API_URL}/wit/workitemsbatch?api-version=7.1-preview.1"
+                details_url = f"{get_azure_devops_rest_api_url()}/wit/workitemsbatch?api-version=7.1-preview.1"
                 details_payload = {"ids": batch_ids}
                 details_response = requests.post(details_url, auth=auth, json=details_payload)
                 logging.debug(f'Details URL: {details_url}')
