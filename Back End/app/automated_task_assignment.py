@@ -13,6 +13,7 @@ def get_all_users():
     auth = HTTPBasicAuth('', PAT)  # Empty username, PAT as the password
     try:
         response = requests.get(url, auth=auth)
+        print(response)
         logging.debug(f'Response Status Code: {response.status_code}')
         if response.status_code == 200:
             raw_data = response.json()
@@ -40,7 +41,6 @@ def clean_user_data(raw_data):
             "mailAddress": user.get("mailAddress", "N/A"),
             "principalName": user.get("principalName", "N/A"),
         })
-
     return cleaned_users
 
 def fetch_unassigned_tasks():
@@ -106,6 +106,7 @@ def get_work_item_count_for_user(user_email):
     """
     Get the count of work items assigned to a specific user from Azure DevOps.
     """
+    prj = get_project_name()
     url = f'https://dev.azure.com/{get_org_name()}/{get_project_name()}/_apis/wit/wiql?api-version=7.1-preview.2'
     auth = HTTPBasicAuth('', PAT)  # Empty username, PAT as the password
 
@@ -114,7 +115,7 @@ def get_work_item_count_for_user(user_email):
         "query": f"""
         SELECT [System.Id]
         FROM WorkItems
-        WHERE [System.AssignedTo] = '{user_email}' 
+        WHERE [System.AssignedTo] = '{user_email}'  AND [System.TeamProject] = '{prj}'
         """
     }
 
@@ -162,7 +163,7 @@ def get_work_item_counts_for_all_users():
             "displayName": user["displayName"],
             "taskCount": task_count
         }
-
+    
     return user_task_counts
 
 def update_work_item_assigned_to(work_item_id, user_email):

@@ -5,11 +5,11 @@ from flask import Flask, jsonify, request
 
 # Initialize OpenAI client
 # Load API key from a text file
-with open('apikeys.txt', 'r') as file:
-    api_key = file.read().strip()
+# with open('apikeys.txt', 'r') as file:
+#     api_key = file.read().strip()
 
 client = OpenAI(
-    api_key=api_key
+    api_key='REMOVED_OPENAI_KEY'
 )
 
 # Function to send a chat with given prompt and context

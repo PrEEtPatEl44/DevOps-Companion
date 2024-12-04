@@ -408,7 +408,7 @@ export default function OverViewPage() {
                     {/* Button Section */}
                     <div className="hidden items-center space-x-2 md:flex">
                       {/* <CalendarDateRangePicker /> */}
-                      <Button>Get AI</Button>
+                      {/* <Button>Get AI</Button> */}
                     </div>
                   </div>
                 </CardHeader>
