@@ -1,6 +1,6 @@
 import requests
 from requests.auth import HTTPBasicAuth
-from app.config import get_azure_devops_rest_api_url, PAT
+from app.config import get_azure_devops_rest_api_url, PAT, get_org_name, get_project_name
 import logging
 import pandas as pd
 from datetime import datetime, timedelta

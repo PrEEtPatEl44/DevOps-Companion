@@ -1,10 +1,10 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, send_file
 from app.automated_task_assignment import get_all_users, fetch_unassigned_tasks, get_work_item_counts_for_all_users, generate_gpt_task_assignment, update_work_item_assigned_to
 from app.status_report import fetch_pending_tasks
 from flask_cors import CORS
 from app.stats import count_work_items_by_state, count_work_items_by_assignment, count_work_items_by_type
 from app.project_plan import fetch_all_work_items,generate_ms_project_plan
-from app.config import jwt_token, set_jwt_token, set_project_name, get_project_name 
+from app.config import jwt_token, set_jwt_token, set_project_name, get_project_name, get_jwt_token
 from app.risk import filter_risk_items
 from helper.outlook import OutlookEmailSender
 from app.status_report import organize_tasks_by_due_date
@@ -137,8 +137,8 @@ def receive_token():
     data = request.get_json()
     jwt_token = data.get('access_token')
     set_jwt_token(jwt_token)
-    if jwt_token:
-        print(f"Received token: {jwt_token}")
+    if get_jwt_token():
+        print(f"Received token: {get_jwt_token()}")
         return jsonify({"message": "Token received successfully", "status": "success"}), 200
     else:
         return jsonify({"message": "No token provided", "status": "error"}), 400
@@ -219,7 +219,7 @@ def create_draft():
     #access_token = jwt_token  # You need to implement this function to fetch a valid token
     try:
         # Instantiate the email sender
-        email_sender = OutlookEmailSender(jwt_token)
+        email_sender = OutlookEmailSender(get_jwt_token())
 
         # Use the OutlookEmailSender's send_email method to create a draft
         draft_link = email_sender.send_mail(subject, body, to_recipients, attachments)
@@ -257,11 +257,15 @@ def generate_email_ai():
 @app.route('/api/status/generate_status_report_plan', methods=['GET'])
 def generate_status_report_plan_route():
     """
-    Flask route to generate a status report plan.
+    Flask route to generate a status report plan and return the file.
     """
     status_report_plan = organize_tasks_by_due_date()
     if status_report_plan:
-        return jsonify(status_report_plan)
+        file_path = status_report_plan
+        if file_path and os.path.exists(file_path):
+            return send_file(file_path, as_attachment=True)
+        else:
+            return jsonify({'error': 'File path is invalid or file does not exist'}), 500
     else:
         return jsonify({'error': 'Failed to generate status report plan'}), 500
 

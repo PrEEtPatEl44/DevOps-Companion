@@ -1,11 +1,24 @@
-from app.automated_task_assignment import get_all_users, calculate_priority_score, validate_and_parse_json
+from app.automated_task_assignment import get_all_users, calculate_priority_score, validate_and_parse_json, get_work_item_counts_for_all_users, update_work_item_assigned_to
 from app.config import AZURE_DEVOPS_REST_API_URL, PAT, PROJECT_NAME, ORG_NAME, jwt_token
 from helper.outlook import OutlookEmailSender
 from app.project_plan import fetch_all_work_items
 import os
 from app.risk import filter_risk_items
 
-def send_email_outlook(subject, body, to_recipients, attachments=None):
+def update_work_item_assigned(work_item_id, user_email):
+    """
+    Updates the assigned user of a work item.
+
+    Args:
+        work_item_id (int): The ID of the work item to be updated.
+        user_email (str): The email of the user to assign the work item to.
+
+    Returns:
+        bool: True if the update was successful, False otherwise.
+    """
+    return  update_work_item_assigned_to(work_item_id, user_email)
+
+def send_email_outlook(subject, body, to_recipients):
     """
     Send an email using Outlook API.
     """
@@ -16,7 +29,7 @@ def send_email_outlook(subject, body, to_recipients, attachments=None):
 
     # Send the email
     sender = OutlookEmailSender(access_token)
-    return sender.send_mail(subject, body, to_recipients, attachments)
+    return sender.send_mail(subject=subject, body=body, to_recipients=to_recipients)
 
 def fetch_emails_outlook():
     """
@@ -58,7 +71,7 @@ def get_all_users_devops():
     """
     Get all users from the Azure DevOps project.
     """
-    return get_all_users()  
+    return get_work_item_counts_for_all_users()
 
 def get_total_priority_by_user_devops():
     """

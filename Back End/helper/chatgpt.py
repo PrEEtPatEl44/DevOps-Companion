@@ -52,7 +52,7 @@ def send_chat(prompt, context, model="gpt-4o-mini", schema=""):
         return content
 
 
-def send_chat_with_functions(messages, model="gpt-4o-2024-08-06", function=None):
+def send_chat_with_functions(messages, model="gpt-4o-2024-08-06", functions=None):
     """
     Sends a chat message to OpenAI GPT-4 model with specific functions.
     :param messages: List of conversation history.
@@ -60,15 +60,27 @@ def send_chat_with_functions(messages, model="gpt-4o-2024-08-06", function=None)
     :param functions: List of functions available for the model to call.
     :return: GPT response as a JSON object.
     """
+    print("Sending chat with functions...:", messages)
     try:
-        chat_completion = client.chat_completions.create(
+        
+        # Pass the functions parameter as an array of objects
+        chat_completion = client.chat.completions.create(
             model=model,
             messages=messages,
-            tools=function,  # Include functions for OpenAI to reference
+            tools=functions  # Pass functions directly without serialization
         )
-        return chat_completion["choices"][0]["message"]
+    
+
+         
+        if chat_completion.choices[0].message:
+            print("Chat completion:", chat_completion)
+            return chat_completion.choices[0].message
+        else:
+            print("NOOOO")
+            raise RuntimeError(f"Error during chat completion: {str(chat_completion)}")
     except Exception as e:
         raise RuntimeError(f"Error during chat completion: {str(e)}")
+
 
 
 # Function to generate an email using GPT

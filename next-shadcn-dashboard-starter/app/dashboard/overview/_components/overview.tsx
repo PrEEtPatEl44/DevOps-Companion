@@ -120,40 +120,38 @@ export default function OverViewPage() {
   //   fetchData();
   // }, []);
 
-
-  const generateStatusReport = async (session:any) => {
+  const generateStatusReport = async (session: any) => {
     try {
       // Request to generate the report
-      const response = await fetch('http://127.0.0.1:5000/api/status/generate_status_report_plan', { method: 'GET' });
-      const result = await response.json();
-      console.log(result);
-      if (result) {
-        // Create the draft email with the generated report attached
-        const attachmentPath = `./${result}`;
-        const createEmailResponse = await fetch('http://127.0.0.1:5000/api/email_sender/create_draft', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            subject: 'Daily Status Report',
-            body: 'Daily Status Report',
-            to_recipients: [selectedUser?.email], // Send to the selected user's email
-            access_token: session?.access_token,
-            attachments: [attachmentPath], // Attach the generated report
-          }),
-        });
+      const response = await fetch('http://127.0.0.1:5000/api/status/generate_status_report_plan', {
+        method: 'GET',
+      });
 
-        const { draftLink } = await createEmailResponse.json();
-        console.log('Email response:', draftLink);
-        if (draftLink) {
-          window.location.href = draftLink; // Redirect to draft email link
-        }
+      if (response.ok) {
+        // Extract the file name from the Content-Disposition header
+        const contentDisposition = response.headers.get('Content-Disposition');
+        const fileName = contentDisposition
+          ? contentDisposition.split('filename=')[1].replace(/"/g, '') // Extract file name
+          : 'work_items_due_dates.xlsx';
+
+        // Convert response to Blob and create a download link
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(url);
+      } else {
+        console.error('Failed to generate the report:', await response.text());
       }
     } catch (error) {
-      console.error('Error generating report or sending email:', error);
+      console.error('Error generating report:', error);
     }
   };
+  
 
   const modalContent = (
     <div className="space-y-4">
