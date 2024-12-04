@@ -28,6 +28,7 @@ export default function OverViewPage() {
   const { data: session } = useSession(); // Getting the session token
   const [projects, setProjects] = useState<any[]>([]); // Store projects data
         const [selectedProject, setSelectedProject] = useState<any | null>(null); // Store selected project
+        const [isReportReady, setIsReportReady] = useState(false);
         const fetchEmails = async () => {
           try {
             setLoading(true);
@@ -122,12 +123,14 @@ export default function OverViewPage() {
 
   const generateStatusReport = async (session: any) => {
     try {
+      setIsReportReady(false);
       // Request to generate the report
       const response = await fetch('http://127.0.0.1:5000/api/status/generate_status_report_plan', {
         method: 'GET',
       });
 
       if (response.ok) {
+        setIsReportReady(true);
         // Extract the file name from the Content-Disposition header
         const contentDisposition = response.headers.get('Content-Disposition');
         const fileName = contentDisposition
@@ -135,15 +138,7 @@ export default function OverViewPage() {
           : 'work_items_due_dates.xlsx';
 
         // Convert response to Blob and create a download link
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = fileName;
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        window.URL.revokeObjectURL(url);
+        
       } else {
         console.error('Failed to generate the report:', await response.text());
       }
@@ -225,7 +220,12 @@ export default function OverViewPage() {
               placeholder="Select a project"
               className="text-black"
             />
-            <Button onClick={() => setIsModalOpen(true)}>Generate Daily Report</Button>
+            <Button onClick={() =>generateStatusReport(session)}>Generate Daily Report</Button>
+            {isReportReady && (
+                <a href="../../../../../Back End/work_items_due_dates.xlsx" download className="download-button">
+                    <Button variant="link" className='text-black'>Download Report</Button>
+                </a>
+            )}
             {isModalOpen && (
               <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Generate Report">
               {modalContent}
