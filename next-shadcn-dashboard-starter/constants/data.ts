@@ -180,6 +180,14 @@ export const navItems: NavItem[] = [
     isActive: false,
     items: [] // No child items
   },
+  {
+    title: 'chatbot',
+    url: '/dashboard/chatbot',
+    icon: 'chatgpt',
+    shortcut: ['e', 'e'],
+    isActive: false,
+    items: [] // No child items
+  },
   // {
   //   title: 'Product',
   //   url: '/dashboard/product',
