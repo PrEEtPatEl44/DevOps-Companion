@@ -45,7 +45,7 @@ import * as React from 'react';
 import { Icons } from '../icons';
 import { signOut, useSession } from "next-auth/react";
 export const company = {
-  name: 'FGF',
+  name: 'FGF Sprints',
   // logo: GalleryVerticalEnd,
   plan: 'F...ing Great Food '
 };
