@@ -62,13 +62,20 @@ def send_chat_with_functions(messages, model="gpt-4o-2024-08-06", functions=None
     """
     print("Sending chat with functions...:", messages)
     try:
-        
-        # Pass the functions parameter as an array of objects
-        chat_completion = client.chat.completions.create(
+    
+        # Pass the functions parameter only if it has a value other than None
+        if functions:
+            print("Functions:", functions)
+            chat_completion = client.chat.completions.create(
             model=model,
             messages=messages,
             tools=functions  # Pass functions directly without serialization
-        )
+            )
+        else:
+            chat_completion = client.chat.completions.create(
+            model=model,
+            messages=messages
+            )
     
 
          
