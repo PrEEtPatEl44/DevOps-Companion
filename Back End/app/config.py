@@ -1,10 +1,9 @@
 # Azure DevOps Configuration
 ORG_NAME = 'preet442727'  # Default Azure DevOps organization name
 PROJECT_NAME = "TestProjectKenn"  # Default Azure DevOps project name
-PAT = 'VJ2qQQgHniwwpMroZeGtayYSqnmVympa62s7oBOtc9DW0rJCjKo0JQQJ99AKACAAAAAAAAAAAAASAZDOE742'  # Default Azure DevOps Personal Access Token
-jwt_token = 'eyJ0eXAiOiJKV1QiLCJub25jZSI6Ii1nVDQzQVJTcG5kYl80b0VGZ3poSXE4eElUM2Z6cVFmbkxua1RxWFFNUzgiLCJhbGciOiJSUzI1NiIsIng1dCI6Inp4ZWcyV09OcFRrd041R21lWWN1VGR0QzZKMCIsImtpZCI6Inp4ZWcyV09OcFRrd041R21lWWN1VGR0QzZKMCJ9...'
+PAT = 'BTqqMvthD6mNT2nvg5Ck9XAxPIQ1DID0zgt5ngvMWDLwQnHaevtDJQQJ99ALACAAAAAvrSh0AAASAZDOUR3P'  # Default Azure DevOps Personal Access Token
+jwt_token = ''
 
-# Base URLs
 
 
 # Getters
@@ -47,6 +46,7 @@ def set_pat(value):
 def set_jwt_token(value):
     global jwt_token
     jwt_token = value
+# Base URLs
 
 AZURE_DEVOPS_GRAPH_API_URL = f"https://vssps.dev.azure.com/{get_org_name()}/_apis/graph"
 AZURE_DEVOPS_REST_API_URL = f"https://dev.azure.com/{get_org_name()}/{get_project_name()}/_apis"

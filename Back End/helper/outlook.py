@@ -3,77 +3,27 @@ import json
 import base64
 import datetime
 import os
-import urllib.parse
+
 class OutlookEmailSender:
     def __init__(self, access_token):
         self.access_token = access_token
         self.graph_url = 'https://graph.microsoft.com/v1.0'
 
-    def send_mail(self, subject, body, to_recipients, attachments=None):
+    def send_mail(self, subject, body, to_recipients):
         """
-        Create a draft email with optional attachments and return a redirect link to the draft.
+        Create a draft email using a deep link.
         """
-        url = f'{self.graph_url}/me/messages'
-        headers = {
-            'Authorization': f'Bearer {self.access_token}',
-            'Content-Type': 'application/json'
-        }
-
-        # Construct the email message
-        email_msg = {
-            "subject": subject,
-            "body": {
-                "contentType": "Text",
-                "content": body
-            },
-            "toRecipients": [{"emailAddress": {"address": recipient}} for recipient in to_recipients],
-            "attachments": []
-        }
-        print("Current directory:", os.getcwd())
-        if attachments and not os.path.isabs(attachments[0]):
-            attachments[0] = os.path.join(os.getcwd(), attachments[0])
-            print(f"Attachment path updated to: {attachments[0]}")
-        # Add attachments if provided
-        if attachments:
-            print("Attachments provided:")
-            for attachment in attachments:
-                with open(attachment, "rb") as file:
-                    print(f"Attaching file: {attachment}")
-                    content_bytes = file.read()
-                    content_base64 = base64.b64encode(content_bytes).decode()
-                    email_msg["attachments"].append({
-                        "@odata.type": "#microsoft.graph.fileAttachment",
-                        "name": attachment.split("/")[-1],
-                        "contentBytes": content_base64
-                    })
-
         try:
-            # Make the POST request to create a draft
-            response = requests.post(url, headers=headers, json=email_msg)
+            # Construct the deep link URL
+            deep_link_url = f"https://outlook.office.com/mail/deeplink/compose?subject={subject}&body={body}&to={','.join(to_recipients)}"
 
-            if response.status_code == 201:  # Created
-                draft = response.json()
-                draft_id = draft.get('id')
-                if draft_id:
-                    redirect_link = f"https://outlook.office.com/mail/deeplink/compose/id/{draft_id}"
-                    print("Draft email created successfully!")
-                    print(f"Redirect link to draft: {redirect_link}")
-                    return redirect_link
-                else:
-                    print("Draft created but no ID returned.")
-                    return None
-            else:
-                print(f"Error creating draft: {response.status_code} - {response.text}")
-                return None
-        except requests.exceptions.RequestException as e:
+            print("Draft created successfully! Open the following link to view and send the draft:")
+            print(deep_link_url)
+            return deep_link_url
+        except Exception as e:
             print(f"An error occurred: {e}")
-            return None
+            return f"An error occurred: {e}"
 
-
-# Example usage:
-# access_token = 'YOUR_ACCESS_TOKEN'
-# email_sender = OutlookEmailSender(access_token)
-# email_sender.send_email('Test Subject', 'Test Body', ['recipient@example.com'], ['path/to/attachment1', 'path/to/attachment2'])
     def fetch_emails(self):
         url = f'{self.graph_url}/me/mailFolders/inbox/messages'
         headers = {
@@ -85,14 +35,18 @@ class OutlookEmailSender:
             '$orderby': 'receivedDateTime DESC'
         }
 
-        response = requests.get(url, headers=headers, params=params)
-        if response.status_code == 200:
-            emails = response.json().get('value', [])
-            for email in emails:
-                print(f"Subject: {email['subject']}, Received: {email['receivedDateTime']}")
-        else:
-            print(f'Error fetching emails: {response.status_code}')
-            print(response.json())
+        try:
+            response = requests.get(url, headers=headers, params=params)
+            if response.status_code == 200:
+                emails = response.json().get('value', [])
+                for email in emails:
+                    print(f"Subject: {email['subject']}, Received: {email['receivedDateTime']}")
+                return emails
+            else:
+                print(f'Error fetching emails: {response.status_code} - {response.text}')
+        except requests.exceptions.RequestException as e:
+            print(f"An error occurred: {e}")
+            return None
 
     def book_meeting(self, subject, start_time, end_time, attendees, location=None, body=None):
         """
@@ -130,13 +84,16 @@ class OutlookEmailSender:
             }
         }
 
-        # Make the POST request to book the meeting
-        response = requests.post(url, headers=headers, json=event)
-
-        if response.status_code == 201:  # Created
-            meeting = response.json()
-            print("Meeting booked successfully!")
-            print(f"Meeting ID: {meeting.get('id')}")
-            return meeting
-        else:
-            print(f"Error booking meeting: {response.status_code} - {response.text}")
+        try:
+            response = requests.post(url, headers=headers, json=event)
+            if response.status_code == 201:  # Created
+                meeting = response.json()
+                print("Meeting booked successfully!")
+                print(f"Meeting ID: {meeting.get('id')}")
+                return meeting
+            else:
+                print(f"Error booking meeting: {response.status_code} - {response.text}")
+                return None
+        except requests.exceptions.RequestException as e:
+            print(f"An error occurred: {e}")
+            return None

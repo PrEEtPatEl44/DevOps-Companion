@@ -1,3 +1,5 @@
+import json
+
 class ChatData:
     def __init__(self):
         self.messages = []  # Stores the conversation history
@@ -18,14 +20,41 @@ class ChatData:
             message["function_call"] = function_call
         self.messages.append(message)
 
-    def add_function_message(self, name, content):
+    def add_assistand_tool_call(self, toolscall): 
+        """Add a function call to the assistant's response."""
+        # Serialize each tool call
+        serialized_tool_calls = [
+            {
+                "id": tool_call.id,
+                "function": {
+                    "name": tool_call.function.name,
+                    "arguments": tool_call.function.arguments
+                }
+            }
+            for tool_call in toolscall
+        ]
+        self.messages.append({
+            "role": "assistant",
+            "tool_calls": serialized_tool_calls,
+        })
+
+    def add_tool_message(self, tool_call_id, content):
         """Add a function message with its name and result."""
-        self.messages.append({"role": "function", "name": name, "content": content})
+        # Serialize the content as JSON string
+        serialized_content = json.dumps(content) if isinstance(content, dict) else content
+        self.messages.append({
+            "role": "tool",
+            "tool_call_id": tool_call_id,
+            "content": serialized_content  # Use serialized content
+        })
 
     def get_messages(self):
         """Retrieve the current conversation history."""
         return self.messages
 
     def reset(self):
-        """Clear the conversation history."""
-        self.messages = []
+        """Keep the first message and delete everything else."""
+        if self.messages:
+            self.messages = [self.messages[0]]
+        else:
+            self.messages = []
