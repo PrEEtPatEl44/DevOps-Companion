@@ -222,7 +222,7 @@ def create_draft():
         email_sender = OutlookEmailSender(get_jwt_token())
 
         # Use the OutlookEmailSender's send_email method to create a draft
-        draft_link = email_sender.send_mail(subject, body, to_recipients, attachments)
+        draft_link = email_sender.send_mail(subject, body, to_recipients)
 
         return jsonify({
             'message': 'Draft created successfully',

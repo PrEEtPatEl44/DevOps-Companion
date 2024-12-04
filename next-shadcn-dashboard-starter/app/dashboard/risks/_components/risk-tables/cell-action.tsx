@@ -115,7 +115,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
                 subject: subject,
                 body: email,
                 to_recipients: userEmails,
-                access_token: session?.access_token,
+                //access_token: session?.access_token,
             };
             console.log(userEmails);
 
