@@ -239,12 +239,13 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
                         }}
                     />
                 </div>
-                <div className="modal-footer">
-                    <Button className='mx-2' onClick={() => SendGeneratedEmail(session, selectedUser.map(user => user.value))}>
-                        Send Emails
-                    </Button>
+                <div className="modal-footer mt-2">
+                    
                     <Button className='mx-2' variant="outline" onClick={() => setResultModalOpen(false)}>
                         Close
+                    </Button>
+                    <Button className='mx-1' onClick={() => SendGeneratedEmail(session, selectedUser.map(user => user.value))}>
+                        Send Emails
                     </Button>
                 </div>
             </Modal>
