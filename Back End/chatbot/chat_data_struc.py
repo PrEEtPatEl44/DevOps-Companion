@@ -1,5 +1,4 @@
 import json
-
 class ChatData:
     def __init__(self):
         self.messages = []  # Stores the conversation history
@@ -20,23 +19,22 @@ class ChatData:
             message["function_call"] = function_call
         self.messages.append(message)
 
-    def add_assistand_tool_call(self, toolscall): 
+    def add_assistant_tool_call(self, toolscall):
         """Add a function call to the assistant's response."""
-        # Serialize each tool call
-        serialized_tool_calls = [
-            {
+        if toolscall and isinstance(toolscall, list):
+            tool_call = toolscall[0]
+            function_call = {
                 "id": tool_call.id,
                 "function": {
                     "name": tool_call.function.name,
                     "arguments": tool_call.function.arguments
-                }
+                },
+                "type": tool_call.type,
             }
-            for tool_call in toolscall
-        ]
-        self.messages.append({
-            "role": "assistant",
-            "tool_calls": serialized_tool_calls,
-        })
+            self.messages.append({
+                "role": "assistant",
+                "tool_calls": [function_call]
+            })
 
     def add_tool_message(self, tool_call_id, content):
         """Add a function message with its name and result."""
@@ -47,6 +45,8 @@ class ChatData:
             "tool_call_id": tool_call_id,
             "content": serialized_content  # Use serialized content
         })
+
+
 
     def get_messages(self):
         """Retrieve the current conversation history."""
