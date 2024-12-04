@@ -342,7 +342,7 @@ def send_message_to_chatbot():
         # Filter out responses without content or with role 'tool'
         filtered_response = [
             msg for msg in response['messages']
-            if msg.get('content') and msg.get('role') != 'tool'
+            if msg.get('content') and msg.get('role') != 'tool' and msg.get('role') != 'system'
         ]
 
         return jsonify({'messages': filtered_response})
