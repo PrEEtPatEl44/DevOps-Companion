@@ -129,7 +129,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
                 });
                 const result = await response.json();
                 console.log(result.draft_link);
-                window.location.href = result.draft_link;
+                window.open(result.draft_link, '_blank');
                 if (response.ok) {
                     toast.success("Email sent successfully.");
                 } else {
