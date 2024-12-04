@@ -3,7 +3,7 @@ import json
 import base64
 import datetime
 import os
-
+import urllib.parse
 class OutlookEmailSender:
     def __init__(self, access_token):
         self.access_token = access_token
@@ -13,9 +13,11 @@ class OutlookEmailSender:
         """
         Create a draft email using a deep link.
         """
+        encoded_subject = urllib.parse.quote(subject)
+        encoded_body = urllib.parse.quote(body)
         try:
             # Construct the deep link URL
-            deep_link_url = f"https://outlook.office.com/mail/deeplink/compose?subject={subject}&body={body}&to={','.join(to_recipients)}"
+            deep_link_url = f"https://outlook.office.com/mail/deeplink/compose?subject={encoded_subject}&body={encoded_body}&to={','.join(to_recipients)}"
 
             print("Draft created successfully! Open the following link to view and send the draft:")
             print(deep_link_url)
