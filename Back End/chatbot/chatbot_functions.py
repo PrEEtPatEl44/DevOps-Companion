@@ -29,6 +29,7 @@ def send_email_outlook(subject, body, to_recipients):
 
     # Send the email
     sender = OutlookEmailSender(access_token)
+    print("Sending email")
     return sender.send_mail(subject=subject, body=body, to_recipients=to_recipients)
 
 def fetch_emails_outlook():

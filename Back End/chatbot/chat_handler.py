@@ -182,7 +182,7 @@ class ChatHandler:
 
         # Process tool calls
         if response.tool_calls:
-            self.chat_data.add_assistand_tool_call(toolscall=response.tool_calls)
+            self.chat_data.add_assistant_tool_call(toolscall=response.tool_calls)
             return self._handle_tool_calls(response.tool_calls)
 
         # Handle regular assistant responses
@@ -260,9 +260,9 @@ class ChatHandler:
         # Debug: Log the response from the model
         print("Model response received:")
         print(response.content)
-
+        self.chat_data.add_assistant_message(content=response.content)
         # Return the updated messages from the response
-        return {"messages": response.content}
+        return {"messages": self.chat_data.get_messages()}
 
 
     def _execute_tool_call(self, tool_call):

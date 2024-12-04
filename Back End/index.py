@@ -338,7 +338,14 @@ def send_message_to_chatbot():
 
     try:
         response = chat_handler.handle_message(user_message)
-        return jsonify(response)
+        
+        # Filter out responses without content or with role 'tool'
+        filtered_response = [
+            msg for msg in response['messages']
+            if msg.get('content') and msg.get('role') != 'tool' and msg.get('role') != 'system'
+        ]
+
+        return jsonify({'messages': filtered_response})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
