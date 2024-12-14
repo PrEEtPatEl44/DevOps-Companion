@@ -427,58 +427,86 @@ export default function DataTableDemo() {
     </div>
     
     <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={''}>
+      <div>
         <h1>Task Assignments</h1>
         
-          {responseData && responseData.length > 0 ? (
-            <div className="mt-4 text-black mx-auto p-6">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Task ID</th>
-                    <th>User Email</th>
-                    <th>Reason</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {responseData.map((task: { [key: string]: string }, index: number) => {
-                    const taskId = Object.keys(task)[0];
-                    const taskAssignments = JSON.parse(task[taskId]).assignments;
-
+        {responseData && responseData.length > 0 ? (
+          <div className="mt-4 text-black mx-auto p-6">
+            <table>
+              <thead>
+                <tr>
+                  <th>Task ID</th>
+                  <th>User Email</th>
+                  <th>Reason</th>
+                </tr>
+              </thead>
+              <tbody>
+                {responseData.map((task: { [key: string]: string }, index: number) => {
+                  const taskId = Object.keys(task)[0];
+                  const taskAssignments = JSON.parse(task[taskId]).assignments;
+    
                     return (
-                      <tr key={index}>
-                        <td className='p-2'>{taskId}</td>
-                        <td className='p-2'>{taskAssignments[0]?.email}</td>
-                        <td className='p-2'>{taskAssignments[0]?.reason}</td>
-                        <td className='p-2'>
-                          <Button onClick={() => assignTask(taskId, taskAssignments[0]?.email)}>
-                            <div className='p-2 text-nowrap'>Confirm AI suggestions</div>
-                          </Button>
-                        </td>
-                        <td className='p-2'>
-                          <X role='button' onClick={() => removeTask(taskId)} />
-                        </td>
-                      </tr>
+                    <tr key={index}>
+                       <td className='p-2'>{taskId}</td>
+                      <td className='p-2'>{taskAssignments[0]?.email}</td>
+                      <td className='p-2'>{taskAssignments[0]?.reason}</td>
+                      <td className='p-2'>
+                      <Button onClick={() => assignTask(taskId, taskAssignments[0]?.email)}>
+                        <div className='p-2 text-nowrap'>Confirm AI suggestions</div>
+                      </Button>
+                      </td>
+                      <td className='p-2'>
+                      <X role='button' onClick={() => removeTask(taskId)} />
+                      </td>
+                      <td className='p-2'>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                        <Button variant="outline">Options</Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                        {taskAssignments.map((assignment: any, idx: number) => (
+                          <DropdownMenuItem
+                            key={idx}
+                            onClick={() => {
+                              const updatedResponseData = responseData.map((task, taskIndex) => {
+                                if (taskIndex === index) {
+                                  const currentAssignments = JSON.parse(task[taskId]).assignments;
+                                  return {
+                                    [taskId]: JSON.stringify({
+                                      assignments: [assignment, ...currentAssignments.filter((a: any) => a.email !== assignment.email)],
+                                    }),
+                                  };
+                                }
+                                return task;
+                              });
+                              setResponseData(updatedResponseData);
+                            }}
+                          >
+                            {assignment.email} - {assignment.reason}
+                          </DropdownMenuItem>
+                        ))}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                      </td>
+                    </tr>
                     );
                   })}
-                </tbody>
-              </table>
-            </div>
-          ) : (
-            
-              <div  className='p-2 w-full text-center'>No tasks left</div>
-            
-          )}
-        
+                  </tbody>
+                  </table>
+                </div>
+                ) : (
+                <div className='p-2 w-full text-center'>No tasks left</div>
+                )}
         <Button
           className="p-2 mx-2"
           onClick={() => assignAllTasks()}
         >
           Assign All Tasks
         </Button>
-
+    
         <Button className='mx-2' variant={'outline'} onClick={() => setIsModalOpen(false)}>Close</Button>
-
-      </Modal>
+      </div>
+    </Modal>
       
 
 
