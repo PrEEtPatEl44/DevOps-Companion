@@ -222,7 +222,7 @@ export default function OverViewPage() {
             />
             <Button onClick={() =>generateStatusReport(session)}>Generate Daily Report</Button>
             {isReportReady && (
-                <a href="../../../../../Back End/work_items_due_dates.xlsx" download className="download-button">
+                <a href="http://127.0.0.1:5000/download-report" download className="download-button">
                     <Button variant="link" className='text-black'>Download Report</Button>
                 </a>
             )}
