@@ -4,7 +4,7 @@ from app.status_report import fetch_pending_tasks
 from flask_cors import CORS
 from app.stats import count_work_items_by_state, count_work_items_by_assignment, count_work_items_by_type
 from app.project_plan import fetch_all_work_items,generate_ms_project_plan
-from app.config import jwt_token, set_jwt_token, set_project_name, get_project_name, get_jwt_token
+from app.config import jwt_token, set_jwt_token, set_project_name, get_project_name, get_jwt_token, file_path
 from app.risk import filter_risk_items
 from helper.outlook import OutlookEmailSender
 from app.status_report import organize_tasks_by_due_date
@@ -12,6 +12,7 @@ from helper.chatgpt import generate_gpt_email,generate_subject_line
 from app.login import get_current_project, fetch_user_projects
 import os
 from chatbot.chat_handler import ChatHandler
+
 app = Flask(__name__)
 CORS(app)
 chat_handler = ChatHandler()
@@ -372,6 +373,11 @@ def reset_chat_history():
         return jsonify({'message': 'Chat history reset successfully'})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+@app.route('/download-report')
+def download_report():
+    file_path = r'C:\Users\preet\OneDrive\Desktop\codes\next-flask\sample-frontend\Back End\work_items_due_dates.xlsx'  # Path to your file
+    return send_file(file_path, as_attachment=True)
 
 
 if __name__ == '__main__':
