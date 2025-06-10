@@ -6,3 +6,173 @@ Back End/helper/__pycache__/chatgpt.cpython-311.pyc
 
 .env.*
 .env
+
+
+# ==================================
+# SHARED / GENERAL
+# ==================================
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE and Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+*.tmp
+*.temp
+
+# ==================================
+# NEXT.JS front-end
+# ==================================
+
+# Dependencies
+front-end/node_modules/
+front-end/npm-debug.log*
+front-end/yarn-debug.log*
+front-end/yarn-error.log*
+front-end/pnpm-debug.log*
+
+# Next.js build output
+front-end/.next/
+front-end/out/
+
+# Production build
+front-end/build/
+front-end/dist/
+
+# Environment variables
+front-end/.env
+front-end/.env.local
+front-end/.env.development.local
+front-end/.env.test.local
+front-end/.env.production.local
+
+# Vercel deployment
+front-end/.vercel
+
+# TypeScript
+front-end/*.tsbuildinfo
+front-end/next-env.d.ts
+
+# Package manager lock files (uncomment the one you don't use)
+# front-end/package-lock.json
+# front-end/yarn.lock
+# front-end/pnpm-lock.yaml
+
+# ==================================
+# PYTHON FLASK back-end
+# ==================================
+
+# Python bytecode
+back-end/__pycache__/
+back-end/*.py[cod]
+back-end/*$py.class
+
+# Distribution / packaging
+back-end/.Python
+back-end/build/
+back-end/develop-eggs/
+back-end/dist/
+back-end/downloads/
+back-end/eggs/
+back-end/.eggs/
+back-end/lib/
+back-end/lib64/
+back-end/parts/
+back-end/sdist/
+back-end/var/
+back-end/wheels/
+back-end/pip-wheel-metadata/
+back-end/share/python-wheels/
+back-end/*.egg-info/
+back-end/.installed.cfg
+back-end/*.egg
+back-end/MANIFEST
+
+# Virtual environments
+back-end/venv/
+back-end/env/
+back-end/ENV/
+back-end/env.bak/
+back-end/venv.bak/
+back-end/.venv/
+
+# Environment variables
+back-end/.env
+back-end/.env.local
+back-end/.env.development
+back-end/.env.production
+
+# Flask specific
+back-end/instance/
+back-end/.webassets-cache
+
+# Database
+back-end/*.db
+back-end/*.sqlite
+back-end/*.sqlite3
+
+# PyInstaller
+back-end/*.manifest
+back-end/*.spec
+
+# Unit test / coverage reports
+back-end/htmlcov/
+back-end/.tox/
+back-end/.nox/
+back-end/.coverage
+back-end/.coverage.*
+back-end/.cache
+back-end/nosetests.xml
+back-end/coverage.xml
+back-end/*.cover
+back-end/*.py,cover
+back-end/.hypothesis/
+back-end/.pytest_cache/
+
+# Jupyter Notebook
+back-end/.ipynb_checkpoints
+
+# IPython
+back-end/profile_default/
+back-end/ipython_config.py
+
+# Celery
+back-end/celerybeat-schedule
+back-end/celerybeat.pid
+
+# SageMath parsed files
+back-end/*.sage.py
+
+# Spyder project settings
+back-end/.spyderproject
+back-end/.spyproject
+
+# Rope project settings
+back-end/.ropeproject
+
+# mkdocs documentation
+back-end/site/
+
+# mypy
+back-end/.mypy_cache/
+back-end/.dmypy.json
+back-end/dmypy.json
+
+# Pyre type checker
+back-end/.pyre/
