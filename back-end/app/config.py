@@ -1,11 +1,18 @@
+import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
+
 # Azure DevOps Configuration
-ORG_NAME = 'preet442727'  # Default Azure DevOps organization name
-PROJECT_NAME = "TestProjectKenn"  # Default Azure DevOps project name
-#PAT = 'VJ2qQQgHniwwpMroZeGtayYSqnmVympa62s7oBOtc9DW0rJCjKo0JQQJ99AKACAAAAAAAAAAAAASAZDOE742'  # Default Azure DevOps Personal Access Token
-PAT = "BTqqMvthD6mNT2nvg5Ck9XAxPIQ1DID0zgt5ngvMWDLwQnHaevtDJQQJ99ALACAAAAAvrSh0AAASAZDOUR3P"
-jwt_token = 'eyJ0eXAiOiJKV1QiLCJub25jZSI6Ii1nVDQzQVJTcG5kYl80b0VGZ3poSXE4eElUM2Z6cVFmbkxua1RxWFFNUzgiLCJhbGciOiJSUzI1NiIsIng1dCI6Inp4ZWcyV09OcFRrd041R21lWWN1VGR0QzZKMCIsImtpZCI6Inp4ZWcyV09OcFRrd041R21lWWN1VGR0QzZKMCJ9...'
+ORG_NAME = os.getenv('AZURE_DEVOPS_ORG_NAME', 'preet442727')  # Default Azure DevOps organization name
+PROJECT_NAME = os.getenv('AZURE_DEVOPS_PROJECT_NAME', "TestProjectKenn")  # Default Azure DevOps project name
+PAT = os.getenv('AZURE_DEVOPS_PAT')  # Azure DevOps Personal Access Token
+JWT_TOKEN = os.getenv('AZURE_DEVOPS_JWT_TOKEN')  # JWT Token for authentication
 
-
+# Base URLs
+AZURE_DEVOPS_GRAPH_API_URL = f"https://vssps.dev.azure.com/{ORG_NAME}/_apis/graph"
+AZURE_DEVOPS_REST_API_URL = f"https://dev.azure.com/{ORG_NAME}/{PROJECT_NAME}/_apis"
 
 # Getters
 def get_org_name():
@@ -18,7 +25,7 @@ def get_pat():
     return PAT
 
 def get_jwt_token():
-    return jwt_token
+    return JWT_TOKEN
 
 def get_azure_devops_graph_api_url():
     return AZURE_DEVOPS_GRAPH_API_URL
@@ -38,16 +45,12 @@ def set_project_name(value):
     PROJECT_NAME = value
     AZURE_DEVOPS_REST_API_URL = f"https://dev.azure.com/{ORG_NAME}/{PROJECT_NAME}/_apis"
     print(AZURE_DEVOPS_REST_API_URL)
-    print(PROJECT_NAME, )
+    print(PROJECT_NAME)
 
 def set_pat(value):
     global PAT
     PAT = value
 
 def set_jwt_token(value):
-    global jwt_token
-    jwt_token = value
-# Base URLs
-
-AZURE_DEVOPS_GRAPH_API_URL = f"https://vssps.dev.azure.com/{get_org_name()}/_apis/graph"
-AZURE_DEVOPS_REST_API_URL = f"https://dev.azure.com/{get_org_name()}/{get_project_name()}/_apis"
+    global JWT_TOKEN
+    JWT_TOKEN = value
