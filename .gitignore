@@ -3,3 +3,6 @@ Back End/app/__pycache__/config.cpython-311.pyc
 Back End/app/__pycache__/stats.cpython-311.pyc
 Back End/app/__pycache__/status_report.cpython-311.pyc
 Back End/helper/__pycache__/chatgpt.cpython-311.pyc
+
+.env.*
+.env

@@ -1,19 +1,25 @@
 import NextAuth from "next-auth";
 import AzureADProvider from "next-auth/providers/azure-ad";
 import { toast } from "sonner";
-const { AZURE_AD_CLIENT_ID, AZURE_AD_CLIENT_SECRET, AZURE_AD_TENANT_ID } =
+const { AZURE_AD_CLIENT_ID, AZURE_AD_CLIENT_SECRET, AZURE_AD_TENANT_ID, NEXTAUTH_SECRET } =
   process.env;
-if (!AZURE_AD_CLIENT_ID || !AZURE_AD_CLIENT_SECRET || !AZURE_AD_TENANT_ID) {
+if (!AZURE_AD_CLIENT_ID || !AZURE_AD_CLIENT_SECRET || !AZURE_AD_TENANT_ID || !NEXTAUTH_SECRET) {
   throw new Error("The Azure AD environment variables are not set.");
 }
+ // Use 'common' for multi-tenant applications
 const handler = NextAuth({
     
-    secret: process.env.NEXTAUTH_SECRET,
+    secret: NEXTAUTH_SECRET,
   providers: [
     AzureADProvider({
       clientId: AZURE_AD_CLIENT_ID,
       clientSecret: AZURE_AD_CLIENT_SECRET,
       tenantId: AZURE_AD_TENANT_ID,
+      authorization: {
+        params: {
+          scope: "openid profile email",
+        }
+    }
     }),
   ],
   callbacks: {
