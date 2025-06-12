@@ -4,7 +4,7 @@ from app.status_report import fetch_pending_tasks
 from flask_cors import CORS
 from app.stats import count_work_items_by_state, count_work_items_by_assignment, count_work_items_by_type
 from app.project_plan import fetch_all_work_items,generate_ms_project_plan
-from app.config import jwt_token, set_jwt_token, set_project_name, get_project_name, get_jwt_token
+from app.config import  set_jwt_token, set_project_name, get_project_name, get_jwt_token
 from app.risk import filter_risk_items
 from helper.outlook import OutlookEmailSender
 from app.status_report import organize_tasks_by_due_date
@@ -16,6 +16,10 @@ from chatbot.chat_handler import ChatHandler
 app = Flask(__name__)
 CORS(app)
 chat_handler = ChatHandler()
+
+@app.route('/', methods=['GET'])
+def health_check():
+    return jsonify({'message': 'Server is running'}), 200
 
 def update_project_name(new_project_name):
     # Open the .env file to read lines

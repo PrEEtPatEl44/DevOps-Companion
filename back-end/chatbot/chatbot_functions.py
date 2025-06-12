@@ -1,5 +1,5 @@
 from app.automated_task_assignment import get_all_users, calculate_priority_score, validate_and_parse_json, get_work_item_counts_for_all_users, update_work_item_assigned_to
-from app.config import AZURE_DEVOPS_REST_API_URL, PAT, PROJECT_NAME, ORG_NAME, jwt_token
+from app.config import AZURE_DEVOPS_REST_API_URL, PAT, PROJECT_NAME, ORG_NAME
 from helper.outlook import OutlookEmailSender
 from app.project_plan import fetch_all_work_items
 import os
