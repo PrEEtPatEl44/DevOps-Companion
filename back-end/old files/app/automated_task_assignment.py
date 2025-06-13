@@ -1,10 +1,13 @@
+import base64
 import logging
 import requests
 from requests.auth import HTTPBasicAuth
 from helper.chatgpt import send_chat
-from app.config import PAT, get_azure_devops_rest_api_url, get_azure_devops_graph_api_url, get_project_name, get_org_name
+from app.config import get_pat, get_azure_devops_rest_api_url, get_azure_devops_graph_api_url, get_project_name, get_org_name
 import json
 from datetime import datetime, timezone, timedelta
+
+PAT = get_pat()
 def get_all_users():
     """
     Fetch and clean all users from Azure DevOps Graph API.
